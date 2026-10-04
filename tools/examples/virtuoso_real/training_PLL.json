@@ -1,0 +1,40 @@
+{
+  "source": {"lib": "training", "cell": "PLL", "view": "schematic", "bBox": [[-3.5375, -1.25], [2.4375, 1.69375]]},
+  "instances": [
+    {"name": "I85", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-2.875, -0.8125], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I84", "lib": "analogLib", "cell": "vdd", "view": "symbol", "xy": [-2.875, -0.0625], "orient": "R0", "ninst": 1, "terms": ["vdd!"], "props": {}},
+    {"name": "I82", "lib": "analogLib", "cell": "vdc", "view": "symbol", "xy": [-2.875, -0.25], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"vdc": "5"}},
+    {"name": "I2", "lib": "training", "cell": "VCO", "view": "symbol", "xy": [-1, -1], "orient": "R0", "ninst": 1, "terms": ["VCO_in", "VCO_out"], "props": {"fc": "4.9e6", "gain": "1000"}},
+    {"name": "I1", "lib": "training", "cell": "LF", "view": "symbol", "xy": [-0.4375, 0.59375], "orient": "R0", "ninst": 1, "terms": ["LF_out", "LF_in"], "props": {}},
+    {"name": "I0", "lib": "training", "cell": "PD", "view": "symbol", "xy": [-2, -0.0625], "orient": "R0", "ninst": 1, "terms": ["PD_inm", "PD_out", "PD_in"], "props": {}},
+    {"name": "PIN2", "lib": "basic", "cell": "opin", "view": "symbol", "xy": [2.03125, 0.59375], "orient": "R0", "ninst": 1, "terms": [], "props": {}},
+    {"name": "PIN0", "lib": "basic", "cell": "ipin", "view": "symbol", "xy": [-2.96875, 0.59375], "orient": "R0", "ninst": 1, "terms": [], "props": {}}
+  ],
+  "nets": [
+    {"name": "net13", "conns": [["I0", "PD_inm"], ["I2", "VCO_out"]]},
+    {"name": "vco_in", "conns": [["I1", "LF_out"], ["I2", "VCO_in"]]},
+    {"name": "in_ref", "conns": [["I0", "PD_in"]]},
+    {"name": "vdd!", "conns": [["I82", "PLUS"], ["I84", "vdd!"]]},
+    {"name": "net12", "conns": [["I0", "PD_out"], ["I1", "LF_in"]]},
+    {"name": "gnd!", "conns": [["I82", "MINUS"], ["I85", "gnd!"]]}
+  ],
+  "pins": [
+    {"name": "vco_in", "dir": "output", "net": "vco_in", "xy": [2.03125, 0.59375]},
+    {"name": "in_ref", "dir": "input", "net": "in_ref", "xy": [-2.96875, 0.59375]}
+  ],
+  "wireShapes": [
+    {"net": "vco_in", "points": [[1.125, -1], [1.78125, -1]]},
+    {"net": "vco_in", "points": [[1.5625, 0.59375], [1.78125, 0.59375]]},
+    {"net": "vco_in", "points": [[1.78125, -1], [1.78125, 0.59375]]},
+    {"net": "vco_in", "points": [[1.78125, 0.59375], [2.09375, 0.59375]]},
+    {"net": "net12", "points": [[-1.34375, 0.59375], [-0.4375, 0.59375]]},
+    {"net": "net13", "points": [[-2, -1], [-1, -1]]},
+    {"net": "net13", "points": [[-2, -1], [-2, -0.0625]]},
+    {"net": "in_ref", "points": [[-3.03125, 0.59375], [-2.65625, 0.59375]]},
+    {"net": "gnd!", "points": [[-2.875, -0.8125], [-2.875, -0.625]]},
+    {"net": "vdd!", "points": [[-2.875, -0.25], [-2.875, -0.0625]]}
+  ],
+  "labels": [
+    {"text": "Phase Locked Loop", "xy": [-0.5, 1.59375], "orient": "R0", "height": 0.1}
+  ]
+}

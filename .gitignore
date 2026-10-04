@@ -1,0 +1,15 @@
+# 生成物 / 缓存
+tools/.cache/
+tools/__pycache__/
+__pycache__/
+*.pyc
+dist/
+
+# Virtuoso 端到端导出的临时产物
+*.log
+virtuoso/.test/out/
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.vscode/

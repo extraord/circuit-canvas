@@ -1,0 +1,58 @@
+{
+  "source": {"lib": "aExamples", "cell": "vcvsOpampTest", "view": "schematic", "bBox": [[-2.88125, 0.8125], [1.9875, 6.06875]]},
+  "instances": [
+    {"name": "I16", "lib": "aExamples", "cell": "vcvsOpampMacro", "view": "symbol", "xy": [-0.6875, 5.5625], "orient": "R0", "ninst": 1, "terms": ["IN-", "IN+", "OUTPUT"], "props": {}},
+    {"name": "I22", "lib": "aExamples", "cell": "vcvs2LevelOpamp", "view": "symbol", "xy": [-1.375, 1.875], "orient": "R0", "ninst": 1, "terms": ["out_again", "in_minus", "in_plus"], "props": {}},
+    {"name": "I19", "lib": "aExamples", "cell": "vcvsOpamp", "view": "symbol", "xy": [-0.8125, 3.8125], "orient": "R0", "ninst": 1, "terms": ["IN-", "IN+", "OUTPUT"], "props": {}},
+    {"name": "V1", "lib": "analogLib", "cell": "vsin", "view": "symbol", "xy": [-2.25, 1.6875], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"acm": "1", "va": "1", "vdc": "0", "freq": "5K"}},
+    {"name": "V11", "lib": "analogLib", "cell": "vsin", "view": "symbol", "xy": [-2.1875, 3.9375], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"freq": "5K", "va": "1", "vdc": "0", "acm": "1"}},
+    {"name": "V0", "lib": "analogLib", "cell": "vsin", "view": "symbol", "xy": [-2.0625, 5.6875], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"acm": "1", "va": "1", "vdc": "0", "freq": "5K"}},
+    {"name": "I27", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [1.5, 1.5], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I29", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [0.75, 5.1875], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I28", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [0.625, 3.4375], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "R2", "lib": "analogLib", "cell": "res", "view": "symbol", "xy": [0.75, 5.5625], "orient": "R0", "ninst": 1, "terms": ["PLUS", "MINUS"], "props": {"r": "10"}},
+    {"name": "R1", "lib": "analogLib", "cell": "res", "view": "symbol", "xy": [0.625, 3.8125], "orient": "R0", "ninst": 1, "terms": ["PLUS", "MINUS"], "props": {"r": "10"}},
+    {"name": "R0", "lib": "analogLib", "cell": "res", "view": "symbol", "xy": [1.5, 1.875], "orient": "R0", "ninst": 1, "terms": ["PLUS", "MINUS"], "props": {"r": "10"}},
+    {"name": "I24", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-1.625, 1.0625], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I23", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-2.25, 1.0625], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I21", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-1.8125, 3.3125], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I20", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-2.1875, 3.3125], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I18", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-1.6875, 5.0625], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I17", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [-2.0625, 5.0625], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}}
+  ],
+  "nets": [
+    {"name": "net28", "conns": [["R2", "PLUS"], ["I16", "OUTPUT"]]},
+    {"name": "net24", "conns": [["R0", "PLUS"], ["I22", "out_again"]]},
+    {"name": "net16", "conns": [["R1", "PLUS"], ["I19", "OUTPUT"]]},
+    {"name": "net27", "conns": [["V0", "PLUS"], ["I16", "IN+"]]},
+    {"name": "net46", "conns": [["V1", "PLUS"], ["I22", "in_minus"]]},
+    {"name": "gnd!", "conns": [["I24", "gnd!"], ["I23", "gnd!"], ["I21", "gnd!"], ["I20", "gnd!"], ["I18", "gnd!"], ["I17", "gnd!"], ["R2", "MINUS"], ["R1", "MINUS"], ["R0", "MINUS"], ["I27", "gnd!"], ["I29", "gnd!"], ["I28", "gnd!"], ["V1", "MINUS"], ["V11", "MINUS"], ["V0", "MINUS"], ["I19", "IN-"], ["I22", "in_plus"], ["I16", "IN-"]]},
+    {"name": "net42", "conns": [["V11", "PLUS"], ["I19", "IN+"]]}
+  ],
+  "pins": [
+
+  ],
+  "wireShapes": [
+    {"net": "net27", "points": [[-2.0625, 5.6875], [-2.0625, 5.75]]},
+    {"net": "gnd!", "points": [[-1.6875, 5.4375], [-1.4375, 5.4375]]},
+    {"net": "net27", "points": [[-2.0625, 5.75], [-1.4375, 5.75]]},
+    {"net": "gnd!", "points": [[-1.6875, 5.0625], [-1.6875, 5.4375]]},
+    {"net": "gnd!", "points": [[-2.0625, 5.0625], [-2.0625, 5.3125]]},
+    {"net": "net28", "points": [[0.25, 5.5625], [0.75, 5.5625]]},
+    {"net": "gnd!", "points": [[-1.8125, 3.6875], [-1.5625, 3.6875]]},
+    {"net": "net42", "points": [[-2.1875, 3.9375], [-2.1875, 4]]},
+    {"net": "net42", "points": [[-2.1875, 4], [-1.5625, 4]]},
+    {"net": "gnd!", "points": [[-1.8125, 3.3125], [-1.8125, 3.6875]]},
+    {"net": "net16", "points": [[0.125, 3.8125], [0.625, 3.8125]]},
+    {"net": "gnd!", "points": [[-1.625, 1.75], [-1.375, 1.75]]},
+    {"net": "net46", "points": [[-2.25, 1.875], [-1.375, 1.875]]},
+    {"net": "gnd!", "points": [[-1.625, 1.0625], [-1.625, 1.75]]},
+    {"net": "gnd!", "points": [[-2.25, 1.0625], [-2.25, 1.3125]]},
+    {"net": "net46", "points": [[-2.25, 1.6875], [-2.25, 1.875]]},
+    {"net": "net24", "points": [[1, 1.875], [1.5, 1.875]]},
+    {"net": "gnd!", "points": [[-2.1875, 3.3125], [-2.1875, 3.5625]]}
+  ],
+  "labels": [
+
+  ]
+}

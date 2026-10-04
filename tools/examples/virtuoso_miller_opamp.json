@@ -1,0 +1,33 @@
+{
+  "source": {"lib": "analog_tb", "cell": "two_stage_miller", "view": "schematic"},
+  "instances": [
+    {"name": "VDD1", "lib": "analogLib", "cell": "vdd", "xy": [2.5, 4.25], "orient": "R0", "props": {}},
+    {"name": "M3", "lib": "analogLib", "cell": "pmos4", "xy": [2.0, 3.25], "orient": "R0", "props": {"w": "40u", "l": "0.18u", "model": "pch"}},
+    {"name": "M4", "lib": "analogLib", "cell": "pmos4", "xy": [3.25, 3.25], "orient": "MY", "props": {"w": "40u", "l": "0.18u", "model": "pch"}},
+    {"name": "M6", "lib": "analogLib", "cell": "pmos4", "xy": [4.5, 3.25], "orient": "R0", "props": {"w": "80u", "l": "0.18u", "model": "pch"}},
+    {"name": "M1", "lib": "analogLib", "cell": "nmos4", "xy": [2.0, 1.875], "orient": "R0", "props": {"w": "20u", "l": "0.18u", "model": "nch"}},
+    {"name": "M2", "lib": "analogLib", "cell": "nmos4", "xy": [3.25, 1.875], "orient": "MY", "props": {"w": "20u", "l": "0.18u", "model": "nch"}},
+    {"name": "M5", "lib": "analogLib", "cell": "nmos4", "xy": [2.5, 0.75], "orient": "R0", "props": {"w": "10u", "l": "0.36u", "model": "nch"}},
+    {"name": "M7", "lib": "analogLib", "cell": "nmos4", "xy": [4.5, 0.75], "orient": "R0", "props": {"w": "10u", "l": "0.36u", "model": "nch"}},
+    {"name": "CC", "lib": "analogLib", "cell": "cap", "xy": [3.875, 2.5], "orient": "R90", "props": {"c": "3p"}},
+    {"name": "IB", "lib": "analogLib", "cell": "idc", "xy": [1.25, 0.75], "orient": "R0", "props": {"dc": "20u"}},
+    {"name": "GND1", "lib": "analogLib", "cell": "gnd", "xy": [1.25, 0.25], "orient": "R0", "props": {}},
+    {"name": "GND2", "lib": "analogLib", "cell": "gnd", "xy": [4.5, 0.125], "orient": "R0", "props": {}}
+  ],
+  "nets": [
+    {"name": "vdd!", "conns": [["VDD1", "+"], ["M3", "S"], ["M3", "B"], ["M4", "S"], ["M4", "B"], ["M6", "S"], ["M6", "B"]]},
+    {"name": "gnd!", "conns": [["GND1", "+"], ["GND2", "+"], ["IB", "MINUS"], ["M5", "S"], ["M5", "B"], ["M7", "S"], ["M7", "B"]]},
+    {"name": "tail", "conns": [["M5", "D"], ["M1", "S"], ["M2", "S"], ["M1", "B"], ["M2", "B"]]},
+    {"name": "n1", "conns": [["M1", "D"], ["M3", "D"], ["M3", "G"], ["M4", "G"]]},
+    {"name": "n2", "conns": [["M2", "D"], ["M4", "D"], ["M6", "G"], ["CC", "PLUS"]]},
+    {"name": "vout", "conns": [["M6", "D"], ["M7", "D"], ["CC", "MINUS"]]},
+    {"name": "nbias", "conns": [["IB", "PLUS"], ["M5", "G"], ["M7", "G"]]},
+    {"name": "vinp", "conns": [["M1", "G"]]},
+    {"name": "vinn", "conns": [["M2", "G"]]}
+  ],
+  "pins": [
+    {"name": "VINP", "dir": "input", "net": "vinp", "xy": [1.0, 1.875]},
+    {"name": "VINN", "dir": "input", "net": "vinn", "xy": [4.25, 1.875]},
+    {"name": "VOUT", "dir": "output", "net": "vout", "xy": [5.5, 1.875]}
+  ]
+}

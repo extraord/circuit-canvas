@@ -1,0 +1,40 @@
+{
+  "source": {"lib": "training", "cell": "inv", "view": "schematic", "bBox": [[-0.14375, -0.5625], [1.35625, 1.1875]]},
+  "instances": [
+    {"name": "I1", "lib": "analogLib", "cell": "vss", "view": "symbol", "xy": [0.9375, -0.25], "orient": "R0", "ninst": 1, "terms": ["vss!"], "props": {}},
+    {"name": "I5", "lib": "analogLib", "cell": "gnd", "view": "symbol", "xy": [0.4375, -0.25], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I4", "lib": "analogLib", "cell": "vdd", "view": "symbol", "xy": [0.6875, 0.875], "orient": "R0", "ninst": 1, "terms": ["vdd!"], "props": {}},
+    {"name": "M1", "lib": "analogLib", "cell": "nmos4", "view": "symbol", "xy": [0.1875, 0.0625], "orient": "R0", "ninst": 1, "terms": ["S", "G", "B", "D"], "props": {"l": "2u", "model": "trnmos", "w": "6u"}},
+    {"name": "M0", "lib": "analogLib", "cell": "pmos4", "view": "symbol", "xy": [0.1875, 0.5625], "orient": "R0", "ninst": 1, "terms": ["S", "G", "B", "D"], "props": {"l": "2u", "w": "12u", "model": "trpmos"}}
+  ],
+  "nets": [
+    {"name": "vdd!", "conns": [["M0", "S"], ["M0", "B"], ["I4", "vdd!"]]},
+    {"name": "gnd!", "conns": [["M1", "S"], ["I5", "gnd!"]]},
+    {"name": "vss!", "conns": [["M1", "B"], ["I1", "vss!"]]},
+    {"name": "A", "conns": [["M0", "G"], ["M1", "G"]]},
+    {"name": "Y", "conns": [["M0", "D"], ["M1", "D"]]}
+  ],
+  "pins": [
+
+  ],
+  "wireShapes": [
+    {"net": "vss!", "points": [[0.9375, -0.25], [0.9375, 0.0625]]},
+    {"net": "vss!", "points": [[0.4375, 0.0625], [0.9375, 0.0625]]},
+    {"net": "vdd!", "points": [[0.4375, 0.875], [0.6875, 0.875]]},
+    {"net": "vdd!", "points": [[0.9375, 0.5625], [0.9375, 0.875]]},
+    {"net": "vdd!", "points": [[0.4375, 0.5625], [0.9375, 0.5625]]},
+    {"net": "vdd!", "points": [[0.6875, 0.875], [0.9375, 0.875]]},
+    {"net": "A", "points": [[0.1875, 0.3125], [0, 0.3125]]},
+    {"net": "Y", "points": [[0.4375, 0.25], [0.9125, 0.25]]},
+    {"net": "A", "points": [[0.1875, 0.3125], [0.1875, 0.5625]]},
+    {"net": "A", "points": [[0.1875, 0.0625], [0.1875, 0.3125]]},
+    {"net": "gnd!", "points": [[0.4375, -0.25], [0.4375, -0.125]]},
+    {"net": "vdd!", "points": [[0.4375, 0.75], [0.4375, 0.875]]},
+    {"net": "Y", "points": [[0.4375, 0.25], [0.4375, 0.375]]}
+  ],
+  "labels": [
+    {"text": "Y", "xy": [0.9375, 0.3125], "orient": "R0", "height": 0.0625},
+    {"text": "A", "xy": [0, 0.375], "orient": "R0", "height": 0.0625},
+    {"text": "inv", "xy": [0.625, 0.73125], "orient": "R0", "height": 0.09375}
+  ]
+}

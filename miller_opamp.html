@@ -1,0 +1,302 @@
+<!--
+  两级 Miller 运放 · 由 Cadence Virtuoso schematic 导出 —— 独立画布文件（single-file canvas）
+  SPDX-License-Identifier: AGPL-3.0-only
+
+  这张图纸的数据已内嵌在本文件里，可以单独拷到别的机器；
+  运行期只依赖同目录下的公用库：styles.css / symbols.generated.js / app.js。
+  要改图纸数据请在源工程里改，然后重新运行 tools/build-canvas-file.py 生成。
+-->
+<!doctype html>
+<!--
+  回路 · 电路绘图 (Huilu Circuit Canvas)
+  Copyright (C) 2026 回路 contributors
+  SPDX-License-Identifier: AGPL-3.0-only
+
+  This program is free software: you can redistribute it and/or modify it under
+  the terms of the GNU Affero General Public License as published by the Free
+  Software Foundation, version 3 of the License. It is distributed in the hope
+  that it will be useful, but WITHOUT ANY WARRANTY. See the LICENSE file.
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4f1">
+  <title>两级 Miller 运放 · 由 Cadence Virtuoso schematic 导出 · 回路</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./symbols.generated.js"></script>
+  <!-- ↓↓↓ 本画布自带的数据（由 tools/build-canvas-file.py 生成，请勿手改） ↓↓↓ -->
+  <script>window.CANVAS_FILE = {"id":"miller-opamp","title":"两级 Miller 运放 · 由 Cadence Virtuoso schematic 导出","sheet":"schematic","source":"analog_tb/two_stage_miller","residualLabel":"","width":940,"height":930,"draft":{"name":"两级 Miller 运放 · 由 Cadence Virtuoso schematic 导出","components":[{"id":"c1","type":"vdd-port","name":"VDD1","value":"","x":354.0,"y":102.0,"rotation":0,"flip":""},{"id":"c2","type":"pmos-bulk","name":"M3","value":"W/L = 40u/0.18u","x":274.0,"y":262.0,"rotation":0,"flip":""},{"id":"c3","type":"pmos-bulk","name":"M4","value":"W/L = 40u/0.18u","x":474.0,"y":262.0,"rotation":0,"flip":"x"},{"id":"c4","type":"pmos-bulk","name":"M6","value":"W/L = 80u/0.18u","x":674.0,"y":262.0,"rotation":0,"flip":""},{"id":"c5","type":"nmos-bulk","name":"M1","value":"W/L = 20u/0.18u","x":274.0,"y":482.0,"rotation":0,"flip":""},{"id":"c6","type":"nmos-bulk","name":"M2","value":"W/L = 20u/0.18u","x":474.0,"y":482.0,"rotation":0,"flip":"x"},{"id":"c7","type":"nmos-bulk","name":"M5","value":"W/L = 10u/0.36u","x":354.0,"y":662.0,"rotation":0,"flip":""},{"id":"c8","type":"nmos-bulk","name":"M7","value":"W/L = 10u/0.36u","x":674.0,"y":662.0,"rotation":0,"flip":""},{"id":"c9","type":"capacitor","name":"CC","value":"3p","x":574.0,"y":382.0,"rotation":270,"flip":""},{"id":"c10","type":"current","name":"IB","value":"20u","x":154.0,"y":662.0,"rotation":0,"flip":""},{"id":"c11","type":"ground","name":"GND1","value":"","x":154.0,"y":742.0,"rotation":0,"flip":""},{"id":"c12","type":"ground","name":"GND2","value":"","x":674.0,"y":762.0,"rotation":0,"flip":""},{"id":"c13","type":"port","name":"VINP","value":"","x":114.0,"y":482.0,"rotation":0,"flip":""},{"id":"c14","type":"port","name":"VINN","value":"","x":634.0,"y":482.0,"rotation":0,"flip":""},{"id":"c15","type":"port","name":"VOUT","value":"","x":834.0,"y":482.0,"rotation":0,"flip":""}],"wires":[{"id":"w1","from":{"component":"c1","pin":0},"to":{"component":"c3","pin":2},"mode":"lv"},{"id":"w2","from":{"component":"c2","pin":2},"to":{"component":"c3","pin":2}},{"id":"w3","from":{"component":"c2","pin":3},"to":{"component":"c3","pin":2},"mode":"hl"},{"id":"w4","from":{"component":"c3","pin":3},"to":{"component":"c3","pin":2},"mode":"hl"},{"id":"w5","from":{"component":"c4","pin":2},"to":{"component":"c3","pin":2}},{"id":"w6","from":{"component":"c4","pin":3},"to":{"component":"c3","pin":2},"mode":"hl"},{"id":"w7","from":{"component":"c11","pin":0},"to":{"component":"c7","pin":2},"mode":"lv"},{"id":"w8","from":{"component":"c12","pin":0},"to":{"component":"c7","pin":2},"mode":"lv"},{"id":"w9","from":{"component":"c10","pin":1},"to":{"component":"c7","pin":2}},{"id":"w10","from":{"component":"c7","pin":3},"to":{"component":"c7","pin":2},"mode":"hl"},{"id":"w11","from":{"component":"c8","pin":2},"to":{"component":"c7","pin":2}},{"id":"w12","from":{"component":"c8","pin":3},"to":{"component":"c7","pin":2},"mode":"hl"},{"id":"w13","from":{"component":"c7","pin":0},"to":{"component":"c5","pin":3},"mode":"lv"},{"id":"w14","from":{"component":"c5","pin":2},"to":{"component":"c5","pin":3},"mode":"lv"},{"id":"w15","from":{"component":"c6","pin":2},"to":{"component":"c5","pin":3}},{"id":"w16","from":{"component":"c6","pin":3},"to":{"component":"c5","pin":3}},{"id":"w17","from":{"component":"c5","pin":0},"to":{"component":"c2","pin":0}},{"id":"w18","from":{"component":"c2","pin":1},"to":{"component":"c2","pin":0},"mode":"hl"},{"id":"w19","from":{"component":"c3","pin":1},"to":{"component":"c2","pin":0},"mode":"hl"},{"id":"w20","from":{"component":"c6","pin":0},"to":{"component":"c3","pin":0}},{"id":"w21","from":{"component":"c4","pin":1},"to":{"component":"c3","pin":0},"mode":"hl"},{"id":"w22","from":{"component":"c9","pin":0},"to":{"component":"c3","pin":0},"mode":"hl"},{"id":"w23","from":{"component":"c4","pin":0},"to":{"component":"c9","pin":1},"mode":"lv"},{"id":"w24","from":{"component":"c8","pin":0},"to":{"component":"c9","pin":1},"mode":"lv"},{"id":"w25","from":{"component":"c15","pin":0},"to":{"component":"c9","pin":1}},{"id":"w26","from":{"component":"c10","pin":0},"to":{"component":"c7","pin":1}},{"id":"w27","from":{"component":"c8","pin":1},"to":{"component":"c7","pin":1}},{"id":"w28","from":{"component":"c5","pin":1},"to":{"component":"c13","pin":0}},{"id":"w29","from":{"component":"c6","pin":1},"to":{"component":"c14","pin":0}}],"texts":[{"id":"tt0","x":470.0,"y":46,"text":"两级 Miller 运放 · 由 Cadence Virtuoso schematic 导出","size":24,"color":"#263934","anchor":"middle"},{"id":"t1","x":339.0,"y":566.0,"text":"tail","size":12,"color":"#4f81a8","anchor":"start"},{"id":"t2","x":649.0,"y":516.0,"text":"vout","size":12,"color":"#4f81a8","anchor":"start"},{"id":"t3","x":494.0,"y":654.0,"text":"nbias","size":12,"color":"#4f81a8","anchor":"middle"},{"id":"t4","x":184.0,"y":474.0,"text":"vinp","size":12,"color":"#4f81a8","anchor":"middle"},{"id":"t5","x":564.0,"y":474.0,"text":"vinn","size":12,"color":"#4f81a8","anchor":"middle"}],"shapes":[]},"residual":[],"snap":[]};</script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="回路首页">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 16h7m8 0h7M12 16a4 4 0 1 0 8 0 4 4 0 1 0-8 0Z"/><circle cx="5" cy="16" r="1.7"/><circle cx="27" cy="16" r="1.7"/></svg></span>
+        <span class="brand-copy"><strong>回路</strong><small>LOCAL CIRCUIT DESK</small></span>
+      </a>
+      <span class="top-divider"></span>
+      <div class="document-title"><span class="live-dot"></span><input id="project-name" aria-label="项目名称" value="RC 低通滤波器"></div>
+      <div class="top-spacer"></div>
+      <div class="save-state" id="save-state"><span class="save-indicator"></span><span>本地草稿</span></div>
+      <a class="top-action" id="open-home-sheet" href="./index.html" title="返回通用电路画布" hidden><span class="button-icon">▧</span><span>通用画布</span></a>
+      <button class="top-action" id="toggle-residual" title="显示或隐藏残余几何（未被拆成对象的线条）" aria-pressed="true" hidden><span class="button-icon">◉</span><span>隐藏残余几何</span></button>
+      <button class="top-action" id="new-project" title="新建空白图纸"><span class="button-icon">＋</span><span>新建</span></button>
+      <button class="top-action" id="open-project" title="打开本地项目 JSON"><span class="button-icon">↥</span><span>打开</span></button>
+      <button class="top-action" id="save-project" title="保存项目 JSON"><span class="button-icon">↓</span><span>保存</span></button>
+      <button class="export-action" id="export-svg"><span class="button-icon">↗</span><span>导出 SVG</span></button>
+      <input id="file-input" type="file" accept=".json,.circuit,application/json" hidden>
+    </header>
+
+    <div class="workspace">
+      <aside class="library-panel">
+        <div class="panel-heading"><div><span class="eyebrow">LIBRARY</span><h1>元件库</h1></div><button class="icon-button" id="collapse-library" title="收起元件库" aria-label="收起元件库">‹</button></div>
+        <label class="search-box"><span aria-hidden="true">⌕</span><input id="part-search" type="search" placeholder="搜索元件" autocomplete="off"><kbd>/</kbd></label>
+        <div class="library-scroll">
+          <section class="part-group" data-group="无源与磁性"><div class="group-title">无源与磁性 <span>08</span></div>
+            <button class="part-button" draggable="true" data-type="resistor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h6l4-7 6 14 6-14 6 14 4-7h6"/></svg></span><span><strong>电阻</strong><small>Resistor</small></span><kbd>R</kbd></button>
+            <button class="part-button" draggable="true" data-type="variable-resistor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h6l4-7 6 14 6-14 6 14 4-7h6M15 3l12 17m-6-1h6v-6"/></svg></span><span><strong>可变电阻</strong><small>Variable resistor</small></span></button>
+            <button class="part-button" draggable="true" data-type="capacitor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h14m0-8v16m10-16v16m0-8h14"/></svg></span><span><strong>电容</strong><small>Capacitor</small></span><kbd>C</kbd></button>
+            <button class="part-button" draggable="true" data-type="variable-capacitor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M3 12h12m0-7v14m11-14v14m0-7h13M11 20l18-18m-5 0h5v5"/></svg></span><span><strong>可变电容</strong><small>Variable capacitor</small></span></button>
+            <button class="part-button" draggable="true" data-type="inductor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h4c0-11 9-11 9 0s9 11 9 0 9-11 9 0h5"/></svg></span><span><strong>电感</strong><small>Inductor</small></span><kbd>L</kbd></button>
+            <button class="part-button" draggable="true" data-type="variable-inductor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 15h4c0-11 9-11 9 0s9 11 9 0 9-11 9 0h5M12 13l16-12m-6 0h6v6"/></svg></span><span><strong>可变电感</strong><small>Variable inductor</small></span></button>
+            <button class="part-button" draggable="true" data-type="inductor-compact"><span class="part-icon"></span><span><strong>电感（紧凑）</strong><small>Inductor, compact</small></span></button>
+            <button class="part-button" draggable="true" data-type="transformer"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 6h7m0 12H2m31-12h7m-7 12h7m-14-15v18m-2-15c-6 0-6 4 0 4s6 4 0 4 0 4 0 4m4-12c6 0 6 4 0 4s-6 4 0 4-0 4 0 4"/></svg></span><span><strong>变压器</strong><small>Transformer</small></span></button>
+            <button class="part-button" draggable="true" data-type="tcoil"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 7h4c0-7 7-7 7 0s7 7 7 0h2m-5 0v12m2-4h5m0-5h2m0-3h4c0-7 7-7 7 0s7 7 7 0h1"/></svg></span><span><strong>T 型线圈</strong><small>T-coil</small></span></button>
+          </section>
+          <section class="part-group" data-group="信号源"><div class="group-title">信号源 <span>05</span></div>
+            <button class="part-button" draggable="true" data-type="voltage"><span class="part-icon circle-icon"><span>＋<i>−</i></span></span><span><strong>电压源</strong><small>Voltage source</small></span><kbd>V</kbd></button>
+            <button class="part-button" draggable="true" data-type="pulse-voltage"><span class="part-icon circle-icon"><span>⌁</span></span><span><strong>脉冲电压源</strong><small>Pulse voltage source</small></span></button>
+            <button class="part-button" draggable="true" data-type="battery"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M21 1v6m0 10v6M12 7h18m-13 10h8"/></svg></span><span><strong>电池</strong><small>Battery</small></span></button>
+            <button class="part-button" draggable="true" data-type="digital-clock"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M21 1v4m0 14v4M8 5h26v14H8zM11 14h4V9h5v5h5V9h5"/></svg></span><span><strong>数字时钟</strong><small>Digital clock</small></span></button>
+            <button class="part-button" draggable="true" data-type="current"><span class="part-icon circle-icon"><span>↑</span></span><span><strong>电流源</strong><small>Current source</small></span><kbd>I</kbd></button>
+          </section>
+          <section class="part-group" data-group="半导体与开关"><div class="group-title">半导体与开关 <span>13</span></div>
+            <button class="part-button" draggable="true" data-type="diode"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h12m14 0h12M14 4v16l14-8-14-8Zm14-8v16"/></svg></span><span><strong>二极管</strong><small>Diode</small></span><kbd>D</kbd></button>
+            <button class="part-button" draggable="true" data-type="zener-diode"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h12m14 0h12M14 4v16l14-8-14-8Zm14-8v13m0 3-4 4m4-4h5"/></svg></span><span><strong>齐纳二极管</strong><small>Zener diode</small></span></button>
+            <button class="part-button" draggable="true" data-type="nmos"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M3 12h10m6-9v18m4-15v12m0-6h12m-8-6v-6m0 18v6"/></svg></span><span><strong>NMOS</strong><small>N-channel MOSFET</small></span><kbd>M</kbd></button>
+            <button class="part-button" draggable="true" data-type="pmos"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M3 12h10m6-9v18m4-15v12m0-6h12m-8-6v-6m0 18v6"/><circle cx="20" cy="12" r="2.5"/></svg></span><span><strong>PMOS</strong><small>P-channel MOSFET</small></span><kbd>P</kbd></button>
+            <button class="part-button" draggable="true" data-type="nmos-bulk"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10m5-9v18m8-15v12m0-6h12m-8-6v-6m0 18v6m-12-1v6"/></svg></span><span><strong>四端 NMOS</strong><small>NMOS with bulk</small></span></button>
+            <button class="part-button" draggable="true" data-type="pmos-bulk"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10m5-9v18m8-15v12m0-6h12m-8-6v-6m0 18v6m-12-1v6"/><circle cx="18" cy="12" r="2"/></svg></span><span><strong>四端 PMOS</strong><small>PMOS with bulk</small></span></button>
+            <button class="part-button" draggable="true" data-type="nmos-depletion"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10m5-9v18m5-15v12m3-12v12m0-6h12m-8-6v-6m0 18v6"/></svg></span><span><strong>耗尽型 NMOS</strong><small>Depletion NMOS</small></span></button>
+            <button class="part-button" draggable="true" data-type="pmos-depletion"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10m5-9v18m5-15v12m3-12v12m0-6h12m-8-6v-6m0 18v6"/><circle cx="18" cy="12" r="2"/></svg></span><span><strong>耗尽型 PMOS</strong><small>Depletion PMOS</small></span></button>
+            <button class="part-button" draggable="true" data-type="npn"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h14m0-8v16m2-14 12-6m-12 14 12 6m-6-3 6 3v-6"/></svg></span><span><strong>NPN 三极管</strong><small>NPN BJT</small></span><kbd>Q</kbd></button>
+            <button class="part-button" draggable="true" data-type="pnp"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h14m0-8v16m2-14 12-6m-12 14 12 6m-6-3 6 3v-6"/></svg></span><span><strong>PNP 三极管</strong><small>PNP BJT</small></span><kbd>B</kbd></button>
+            <button class="part-button" draggable="true" data-type="ideal-switch"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h11m14 0h13m-27 0 12-8"/><circle cx="13" cy="12" r="2"/><circle cx="27" cy="12" r="2"/></svg></span><span><strong>理想开关</strong><small>Ideal switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="closed-switch"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h11l14 0h13"/><circle cx="13" cy="12" r="2"/><circle cx="27" cy="12" r="2"/></svg></span><span><strong>闭合开关</strong><small>Closed switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="controlled-switch"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M27 1v5m0 12v5M2 7h10m-10 10h10m5-15 10 5v10l-10 5z"/></svg></span><span><strong>受控开关</strong><small>Controlled switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="externally-controlled-switch"><span class="part-icon"></span><span><strong>外部受控开关</strong><small>Externally controlled switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="ndmos"><span class="part-icon"></span><span><strong>高压 NMOS (DMOS)</strong><small>High-voltage NMOS</small></span></button>
+            <button class="part-button" draggable="true" data-type="pdmos"><span class="part-icon"></span><span><strong>高压 PMOS (DMOS)</strong><small>High-voltage PMOS</small></span></button>
+            <button class="part-button" draggable="true" data-type="voltage-controlled-switch"><span class="part-icon"></span><span><strong>压控开关</strong><small>Voltage-controlled switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="simple-switch"><span class="part-icon"></span><span><strong>单刀开关</strong><small>Simple switch</small></span></button>
+            <button class="part-button" draggable="true" data-type="spdt-switch"><span class="part-icon"></span><span><strong>单刀双掷开关</strong><small>SPDT switch</small></span></button>
+          </section>
+          <section class="part-group" data-group="受控源"><div class="group-title">受控源 <span>04</span></div>
+            <button class="part-button" draggable="true" data-type="vcvs"><span class="part-icon"></span><span><strong>压控电压源</strong><small>VCVS</small></span></button>
+            <button class="part-button" draggable="true" data-type="vccs"><span class="part-icon"></span><span><strong>压控电流源</strong><small>VCCS</small></span></button>
+            <button class="part-button" draggable="true" data-type="ccvs"><span class="part-icon"></span><span><strong>流控电压源</strong><small>CCVS</small></span></button>
+            <button class="part-button" draggable="true" data-type="cccs"><span class="part-icon"></span><span><strong>流控电流源</strong><small>CCCS</small></span></button>
+          </section>
+          <section class="part-group" data-group="模拟模块"><div class="group-title">模拟模块 <span>07</span></div>
+            <button class="part-button" draggable="true" data-type="opamp"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h9"/></svg></span><span><strong>运算放大器</strong><small>Op amp</small></span></button>
+            <button class="part-button" draggable="true" data-type="voltage-amp"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h9M12 8h4m-2-2v4m-2 5h4"/></svg></span><span><strong>电压放大器</strong><small>Voltage amp</small></span></button>
+            <button class="part-button" draggable="true" data-type="fd-amp"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h8m-8 4h8"/></svg></span><span><strong>全差分放大器</strong><small>Fully differential amp</small></span></button>
+            <button class="part-button" draggable="true" data-type="comparator"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h9m-20-7h4m-2-2v4"/></svg></span><span><strong>比较器</strong><small>Comparator</small></span></button>
+            <button class="part-button" draggable="true" data-type="comparator-unmarked"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h9"/></svg></span><span><strong>无极性比较器</strong><small>Unmarked comparator</small></span></button>
+            <button class="part-button" draggable="true" data-type="comparator-inputs-swapped"><span class="part-icon"></span><span><strong>比较器 · 输入反转</strong><small>Comparator, inputs swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-wide"><span class="part-icon"></span><span><strong>宽间距运放</strong><small>Op amp · wide</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-lettered"><span class="part-icon"></span><span><strong>带标注运放</strong><small>Op amp · lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-inputs-swapped"><span class="part-icon"></span><span><strong>运放 · 输入反转</strong><small>Op amp · inputs swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="transconductance"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-5h9"/><text x="14" y="14" font-size="7" fill="currentColor">gm</text></svg></span><span><strong>跨导放大器</strong><small>Transconductance</small></span></button>
+            <button class="part-button" draggable="true" data-type="differential-transconductance"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 31 12 8 22zM2 7h6m-6 10h6m23-7h8m-8 4h8"/><text x="14" y="14" font-size="7" fill="currentColor">gm</text></svg></span><span><strong>差分跨导放大器</strong><small>Differential gm</small></span></button>
+            <button class="part-button" draggable="true" data-type="differential-transconductance-inputs-swapped"><span class="part-icon"></span><span><strong>差分跨导 · 输入反转</strong><small>Differential gm, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="comparator-unmarked-inputs-swapped"><span class="part-icon"></span><span><strong>无极性比较器 · 输入反转</strong><small>Unmarked comparator, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="voltage-amplifier-lettered"><span class="part-icon"></span><span><strong>电压放大器 · 带标注</strong><small>Voltage amp, lettered</small></span></button>
+          </section>
+          <section class="part-group" data-group="运放家族"><div class="group-title">运放家族 <span>20</span></div>
+            <button class="part-button" draggable="true" data-type="opamp-wide-lettered"><span class="part-icon"></span><span><strong>宽体运放 · 标注</strong><small>Wide, lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-wide-inputs-swapped"><span class="part-icon"></span><span><strong>宽体运放 · 输入反转</strong><small>Wide, inputs swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>运放 · 标注＋输入反转</strong><small>Lettered, inputs swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-wide-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>宽体运放 · 标注＋输入反转</strong><small>Wide, lettered, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential"><span class="part-icon"></span><span><strong>差分运放</strong><small>Differential</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide"><span class="part-icon"></span><span><strong>差分运放 · 宽体</strong><small>Differential, wide</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-crossed"><span class="part-icon"></span><span><strong>差分运放 · 输出交叉</strong><small>Differential, crossed</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-crossed"><span class="part-icon"></span><span><strong>差分运放 · 宽体＋交叉</strong><small>Differential, wide, crossed</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-lettered"><span class="part-icon"></span><span><strong>差分运放 · 标注</strong><small>Differential, lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-lettered"><span class="part-icon"></span><span><strong>差分运放 · 宽体＋标注</strong><small>Differential, wide, lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-crossed-lettered"><span class="part-icon"></span><span><strong>差分运放 · 交叉＋标注</strong><small>Differential, crossed, lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-crossed-lettered"><span class="part-icon"></span><span><strong>差分运放 · 全组合</strong><small>Wide, crossed, lettered</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 输入反转</strong><small>Differential, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 宽体＋输入反转</strong><small>Differential, wide, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-crossed-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 交叉＋输入反转</strong><small>Differential, crossed, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-crossed-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 宽体＋交叉＋反转</strong><small>Wide, crossed, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 标注＋输入反转</strong><small>Differential, lettered, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 宽体＋标注＋反转</strong><small>Differential, wide, lettered, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-crossed-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 交叉＋标注＋反转</strong><small>Differential, crossed, lettered, swapped</small></span></button>
+            <button class="part-button" draggable="true" data-type="opamp-differential-wide-crossed-lettered-inputs-swapped"><span class="part-icon"></span><span><strong>差分运放 · 全组合＋反转</strong><small>Wide, crossed, lettered, swapped</small></span></button>
+          </section>
+          <section class="part-group" data-group="数字逻辑"><div class="group-title">数字逻辑 <span>11</span></div>
+            <button class="part-button" draggable="true" data-type="dff"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M10 3h22v18H10zM2 8h8m-8 8h8m22-8h8m-8 8h8m-22-3 4 3-4 3"/></svg></span><span><strong>D 触发器</strong><small>D Flip-Flop</small></span><kbd>F</kbd></button>
+            <button class="part-button" draggable="true" data-type="xor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M3 2q9 10 0 20M8 2h9a10 10 0 0 1 0 20H8M2 7h8M2 17h8m17-5h12"/></svg></span><span><strong>异或门</strong><small>XOR gate</small></span><kbd>X</kbd></button>
+            <button class="part-button" draggable="true" data-type="and"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M7 2h9a10 10 0 0 1 0 20H7zM2 7h5M2 17h5m19-5h12"/></svg></span><span><strong>与门</strong><small>AND gate</small></span><kbd>A</kbd></button>
+            <button class="part-button" draggable="true" data-type="or"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M7 2q9 0 22 10Q16 22 7 22q8-10 0-20zM2 7h6M2 17h6m21-5h10"/></svg></span><span><strong>或门</strong><small>OR gate</small></span><kbd>O</kbd></button>
+            <button class="part-button" draggable="true" data-type="nand"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M5 2h9a10 10 0 0 1 0 20H5zM1 7h4M1 17h4m23-5h4m8 0h2"/><circle cx="34" cy="12" r="3"/></svg></span><span><strong>与非门</strong><small>NAND gate</small></span><kbd>N</kbd></button>
+            <button class="part-button" draggable="true" data-type="nor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M7 2q9 0 22 10Q16 22 7 22q8-10 0-20zM2 7h6M2 17h6m27-5h2"/><circle cx="34" cy="12" r="3"/></svg></span><span><strong>或非门</strong><small>NOR gate</small></span><kbd>Z</kbd></button>
+            <button class="part-button" draggable="true" data-type="not"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h6m0-9 20 9-20 9zM34 12h6"/><circle cx="31" cy="12" r="3"/></svg></span><span><strong>非门</strong><small>Inverter</small></span><kbd>!</kbd></button>
+            <button class="part-button" draggable="true" data-type="xnor"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M3 2q9 10 0 20M8 2h9a10 10 0 0 1 0 20H8M2 7h8M2 17h8m17-5h3m6 0h4"/><circle cx="32" cy="12" r="3"/></svg></span><span><strong>同或门</strong><small>XNOR gate</small></span></button>
+            <button class="part-button" draggable="true" data-type="buffer"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M8 2 29 12 8 22zM2 12h6m21 0h11"/></svg></span><span><strong>缓冲器</strong><small>Buffer</small></span></button>
+            <button class="part-button" draggable="true" data-type="delay-cell"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h6m26 0h6M8 3h26v18H8z"/><text x="15" y="15" font-size="8" fill="currentColor">dt</text></svg></span><span><strong>延迟单元</strong><small>Delay cell</small></span></button>
+            <button class="part-button" draggable="true" data-type="dff-reset"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M10 2h22v20H10zM2 5h8m-8 7h8m-8 7h8m22-12h8m-8 10h8m-22-7 4 2-4 2"/></svg></span><span><strong>带复位 D 触发器</strong><small>D Flip-Flop + reset</small></span></button>
+            <button class="part-button" draggable="true" data-type="dff-q"><span class="part-icon"></span><span><strong>D 触发器 · 单输出</strong><small>D flip-flop, Q only</small></span></button>
+            <button class="part-button" draggable="true" data-type="and-3"><span class="part-icon"></span><span><strong>与门 3 输入</strong><small>AND gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="and-4"><span class="part-icon"></span><span><strong>与门 4 输入</strong><small>AND gate, 4-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="or-3"><span class="part-icon"></span><span><strong>或门 3 输入</strong><small>OR gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="or-4"><span class="part-icon"></span><span><strong>或门 4 输入</strong><small>OR gate, 4-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="nand-3"><span class="part-icon"></span><span><strong>与非门 3 输入</strong><small>NAND gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="nand-4"><span class="part-icon"></span><span><strong>与非门 4 输入</strong><small>NAND gate, 4-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="nor-3"><span class="part-icon"></span><span><strong>或非门 3 输入</strong><small>NOR gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="nor-4"><span class="part-icon"></span><span><strong>或非门 4 输入</strong><small>NOR gate, 4-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="xor-3"><span class="part-icon"></span><span><strong>异或门 3 输入</strong><small>XOR gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="xor-4"><span class="part-icon"></span><span><strong>异或门 4 输入</strong><small>XOR gate, 4-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="xnor-3"><span class="part-icon"></span><span><strong>同或门 3 输入</strong><small>XNOR gate, 3-input</small></span></button>
+            <button class="part-button" draggable="true" data-type="xnor-4"><span class="part-icon"></span><span><strong>同或门 4 输入</strong><small>XNOR gate, 4-input</small></span></button>
+          </section>
+          <section class="part-group" data-group="行为级模块"><div class="group-title">行为级模块 <span>08</span></div>
+            <button class="part-button" draggable="true" data-type="adder"><span class="part-icon"></span><span><strong>加法器</strong><small>Adder</small></span></button>
+            <button class="part-button" draggable="true" data-type="multiplier"><span class="part-icon"></span><span><strong>乘法器</strong><small>Multiplier</small></span></button>
+            <button class="part-button" draggable="true" data-type="integrator"><span class="part-icon"></span><span><strong>积分器</strong><small>Integrator</small></span></button>
+            <button class="part-button" draggable="true" data-type="unit-delay"><span class="part-icon"></span><span><strong>单位延迟</strong><small>Unit delay</small></span></button>
+            <button class="part-button" draggable="true" data-type="dt-integrator"><span class="part-icon"></span><span><strong>离散时间积分器</strong><small>Discrete-time integrator</small></span></button>
+            <button class="part-button" draggable="true" data-type="quantizer"><span class="part-icon"></span><span><strong>量化器</strong><small>Quantizer</small></span></button>
+            <button class="part-button" draggable="true" data-type="adc"><span class="part-icon"></span><span><strong>模数转换器</strong><small>ADC</small></span></button>
+            <button class="part-button" draggable="true" data-type="dac"><span class="part-icon"></span><span><strong>数模转换器</strong><small>DAC</small></span></button>
+          </section>
+          <section class="part-group" data-group="端口与标注"><div class="group-title">端口与标注 <span>04</span></div>
+            <button class="part-button" draggable="true" data-type="port"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10"/><circle cx="22" cy="12" r="10"/><text x="18" y="15" font-size="8" fill="currentColor">P</text></svg></span><span><strong>端口</strong><small>Port</small></span></button>
+            <button class="part-button" draggable="true" data-type="port-filled"><span class="part-icon"><svg viewBox="0 0 42 24"><path d="M2 12h10"/><circle cx="22" cy="12" r="10" fill="currentColor"/><text x="18" y="15" font-size="8" fill="#fff">P</text></svg></span><span><strong>实心端口</strong><small>Filled port</small></span></button>
+            <button class="part-button" draggable="true" data-type="vdd-port"><span class="part-icon"></span><span><strong>电源端口</strong><small>VDD port</small></span></button>
+            <button class="part-button" draggable="true" data-type="ground"><span class="part-icon ground-icon"><svg viewBox="0 0 42 24"><path d="M21 2v8m-11 0h22m-18 5h14m-10 5h6"/></svg></span><span><strong>接地</strong><small>Ground</small></span><kbd>G</kbd></button>
+            <button class="part-button" data-tool="text"><span class="part-icon text-icon">T</span><span><strong>文字标注</strong><small>Annotation</small></span><kbd>T</kbd></button>
+          </section>
+          <section class="part-group" data-group="函数曲线与波形"><div class="group-title">函数曲线与波形 <span>05</span></div>
+            <button class="part-button" draggable="true" data-type="math-curve"><span class="part-icon"></span><span><strong>函数曲线</strong><small>Function curve · sin / exp / 方波…</small></span></button>
+            <button class="part-button" draggable="true" data-type="prob-curve"><span class="part-icon"></span><span><strong>概率分布</strong><small>Distribution · 正态 / 指数 / 泊松…</small></span></button>
+            <button class="part-button" draggable="true" data-type="digital-wave-clock"><span class="part-icon"></span><span><strong>时钟波形</strong><small>Clock · 周期与占空比可调</small></span></button>
+            <button class="part-button" draggable="true" data-type="digital-wave-signal"><span class="part-icon"></span><span><strong>数据波形</strong><small>Data · 序列可填 1011</small></span></button>
+            <button class="part-button" draggable="true" data-type="digital-wave-bus"><span class="part-icon"></span><span><strong>总线波形</strong><small>Bus · 分组标签 D0 D1 D2</small></span></button>
+          </section>
+          <section class="part-group" data-group="标尺与可调矩形"><div class="group-title">标尺与可调矩形 <span>02</span></div>
+            <button class="part-button" draggable="true" data-type="ruler"><span class="part-icon"></span><span><strong>标尺</strong><small>Ruler · 尺寸随长度与比例</small></span></button>
+            <button class="part-button" draggable="true" data-type="rect-block"><span class="part-icon"></span><span><strong>可调矩形</strong><small>Rectangle with W/H fields</small></span></button>
+          </section>
+          <section class="part-group" data-group="图形与标注"><div class="group-title">图形与标注 <span>17</span></div>
+            <button class="part-button shape-part" data-shape="rectangle"><span class="part-icon"></span><span><strong>矩形</strong><small>Rectangle</small></span></button>
+            <button class="part-button shape-part" data-shape="rounded-rect"><span class="part-icon"></span><span><strong>圆角矩形</strong><small>Rounded rectangle</small></span></button>
+            <button class="part-button shape-part" data-shape="dashed-rect"><span class="part-icon"></span><span><strong>虚线框</strong><small>Dashed frame</small></span></button>
+            <button class="part-button shape-part" data-shape="ellipse"><span class="part-icon"></span><span><strong>椭圆 / 圆</strong><small>Ellipse / circle</small></span></button>
+            <button class="part-button shape-part" data-shape="triangle"><span class="part-icon"></span><span><strong>三角形</strong><small>Triangle</small></span></button>
+            <button class="part-button shape-part" data-shape="right-triangle"><span class="part-icon"></span><span><strong>直角三角形</strong><small>Right triangle</small></span></button>
+            <button class="part-button shape-part" data-shape="diamond"><span class="part-icon"></span><span><strong>菱形</strong><small>Diamond</small></span></button>
+            <button class="part-button shape-part" data-shape="parallelogram"><span class="part-icon"></span><span><strong>平行四边形</strong><small>Parallelogram</small></span></button>
+            <button class="part-button shape-part" data-shape="trapezoid"><span class="part-icon"></span><span><strong>梯形</strong><small>Trapezoid</small></span></button>
+            <button class="part-button shape-part" data-shape="pentagon"><span class="part-icon"></span><span><strong>五边形</strong><small>Pentagon</small></span></button>
+            <button class="part-button shape-part" data-shape="hexagon"><span class="part-icon"></span><span><strong>六边形</strong><small>Hexagon</small></span></button>
+            <button class="part-button shape-part" data-shape="octagon"><span class="part-icon"></span><span><strong>八边形</strong><small>Octagon</small></span></button>
+            <button class="part-button shape-part" data-shape="star"><span class="part-icon"></span><span><strong>五角星</strong><small>Star</small></span></button>
+            <button class="part-button shape-part" data-shape="cross"><span class="part-icon"></span><span><strong>十字</strong><small>Cross</small></span></button>
+            <button class="part-button shape-part" data-shape="arrow"><span class="part-icon"></span><span><strong>箭头</strong><small>Arrow</small></span></button>
+            <button class="part-button shape-part" data-shape="arrow-double"><span class="part-icon"></span><span><strong>双向箭头</strong><small>Double-headed arrow</small></span></button>
+            <button class="part-button shape-part" data-shape="line"><span class="part-icon"></span><span><strong>直线</strong><small>Line</small></span></button>
+          </section>
+        </div>
+        <div class="library-tip"><span class="tip-star">✳</span><span>拖入画布放置元件<br><b>或点击元件快速添加</b></span></div>
+      </aside>
+
+      <main class="drawing-area">
+        <div class="canvas-toolbar">
+          <div class="tool-segment" role="toolbar" aria-label="绘图工具">
+            <button class="tool-button active" data-tool="select" title="选择和移动 (Esc)"><span class="tool-glyph cursor-glyph">↖</span><span>选择</span></button>
+            <button class="tool-button" data-tool="wire" title="连接两个引脚 (W)"><span class="tool-glyph wire-glyph">⌁</span><span>导线</span></button>
+            <button class="tool-button" data-tool="text" title="添加文字标注 (T)"><span class="tool-glyph text-glyph">T</span><span>标注</span></button>
+            <button class="tool-button" data-tool="shape" title="拖动绘制图形 (S)"><span class="tool-glyph shape-glyph">▱</span><span>图形</span></button>
+          </div>
+          <span class="toolbar-rule"></span>
+          <button class="icon-button" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销">↶</button>
+          <button class="icon-button" id="redo" title="重做 (Ctrl+Shift+Z)" aria-label="重做">↷</button>
+          <span class="toolbar-spacer"></span>
+          <span class="canvas-hint" id="canvas-hint">点击元件可选中，拖动可移动</span>
+          <span class="toolbar-rule"></span>
+          <button class="icon-button" id="zoom-out" title="缩小" aria-label="缩小">−</button>
+          <span class="zoom-value" id="zoom-value">100%</span>
+          <button class="icon-button" id="zoom-in" title="放大" aria-label="放大">＋</button>
+          <button class="fit-button" id="fit-view" title="适配画布">适配</button>
+        </div>
+        <div class="canvas-wrap" id="canvas-wrap">
+          <div class="canvas-paper">
+            <svg id="circuit-canvas" viewBox="0 0 1200 800" role="application" aria-label="电路绘图画布">
+              <defs>
+                <pattern id="minor-grid" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" fill="#ccd4cf"/></pattern>
+                <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#minor-grid)"/><path d="M100 0H0V100" fill="none" stroke="#c6d0ca" stroke-width="1"/></pattern>
+                <marker id="residual-arrow" markerWidth="0.14" markerHeight="0.12" refX="0.12" refY="0.05" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 0.13 0.05 L 0 0.1 Z" fill="#263934"/></marker>
+              </defs>
+              <rect class="canvas-bg" x="0" y="0" width="1200" height="800" fill="url(#major-grid)"/>
+              <g id="residual-layer" class="residual-layer" pointer-events="none"></g>
+              <g id="shape-layer"></g>
+              <g id="wire-layer"></g>
+              <g id="text-layer"></g>
+              <g id="component-layer"></g>
+              <g id="interaction-layer"></g>
+            </svg>
+          </div>
+          <div class="canvas-coordinates" id="coordinate-readout">X 000 · Y 000</div>
+          <div class="hscroll" id="scrollbar-x" hidden><div class="hscroll-thumb" id="scrollbar-thumb-x"></div></div>
+          <div class="hscroll vscroll" id="scrollbar-y" hidden><div class="hscroll-thumb" id="scrollbar-thumb-y"></div></div>
+          <div class="canvas-status"><span class="status-pin"></span><span id="object-count">3 个元件 · 0 条导线</span></div>
+          <div class="empty-canvas" id="empty-hint" hidden><span class="empty-spark">✳</span><strong>从元件库开始绘制</strong><span>拖入一个元件，或点击左侧元件快速放置</span><button id="load-example">放入 RC 示例电路</button></div>
+        </div>
+        <footer class="statusbar"><span><span class="status-dot"></span>本地工作区</span><span class="status-separator">/</span><span id="status-message">所有更改仅保存在此设备</span><span class="statusbar-spacer"></span><span>画布 <b>1200 × 800</b></span><span class="status-separator">·</span><button class="license-link" id="license-open" title="查看许可与声明">回路 v0.1 · AGPL-3.0</button></footer>
+      </main>
+
+      <aside class="inspector-panel" id="inspector-panel">
+        <div class="panel-heading inspector-heading">
+          <div class="inspector-tabs" role="tablist" aria-label="侧栏视图">
+            <button type="button" class="inspector-tab active" id="tab-properties" role="tab" aria-selected="true" aria-controls="inspector-content" data-inspector-tab="properties"><span class="eyebrow">PROPERTIES</span>属性</button>
+            <button type="button" class="inspector-tab" id="tab-netlist" role="tab" aria-selected="false" aria-controls="netlist-pane" data-inspector-tab="netlist"><span class="eyebrow">NETLIST</span>网表</button>
+          </div>
+          <button class="icon-button" id="collapse-inspector" title="收起侧栏" aria-label="收起侧栏">›</button>
+        </div>
+        <div class="inspector-content" id="inspector-content" role="tabpanel" aria-labelledby="tab-properties">
+          <div class="selection-empty" id="selection-empty"><div class="selection-art"><span></span><span></span><span></span></div><strong>选择一个元件</strong><p>元件属性会显示在这里。<br>你也可以选择导线或文字。</p></div>
+        </div>
+        <div class="netlist-pane" id="netlist-pane" role="tabpanel" aria-labelledby="tab-netlist" hidden>
+          <div class="netlist-head">
+            <span class="netlist-badge">SPICE</span>
+            <div class="netlist-actions">
+              <button type="button" class="netlist-action" id="netlist-copy" title="复制网表到剪贴板"><span class="netlist-action-icon">⧉</span>复制</button>
+              <button type="button" class="netlist-action" id="netlist-export" title="下载 .sp 网表文件"><span class="netlist-action-icon">↓</span>.sp</button>
+            </div>
+          </div>
+          <pre class="netlist-code" id="netlist-code" tabindex="0" aria-label="SPICE 网表"></pre>
+          <div class="netlist-note" id="netlist-note" aria-live="polite"></div>
+          <p class="netlist-hint">网表由画布实时推导，可供阅读与仿真参考；器件模型、.subckt 定义与仿真卡需要你按工艺自行补上。</p>
+        </div>
+        <div class="inspector-bottom"><span class="local-lock">▣</span><span>数据只保存在本机</span></div>
+      </aside>
+    </div>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+  <div class="license-overlay" id="license-overlay" hidden>
+    <section class="license-card" role="dialog" aria-modal="true" aria-labelledby="license-title">
+      <h3 id="license-title">许可与声明</h3>
+      <p><strong>回路 · 电路绘图</strong> 版权所有 (C) 2026 回路 contributors，依 <strong>AGPL-3.0-only</strong> 发布。</p>
+      <p>本程序是自由软件：你可以依据自由软件基金会发布的 GNU Affero 通用公共许可证（第 3 版）条款重新发布和/或修改它。</p>
+      <p>本程序分发时希望其有用，但不提供任何担保，甚至不包含适销性或特定用途适用性的默示担保。详见 GNU Affero 通用公共许可证。</p>
+      <p>你应已随本程序收到许可证副本；若没有，请见 &lt;https://www.gnu.org/licenses/&gt;。完整文本见项目目录下的 <code>LICENSE</code>。</p>
+      <p class="license-attrib">元件坐标体系与分类参考 <a href="https://github.com/cascode-ai/analog-canvas" target="_blank" rel="noreferrer noopener">Analog Canvas</a>（© 2026 Zengchun Chen 与 Zhishuai Zhang，AGPL-3.0-only）；本项目符号路径为独立绘制。</p>
+      <button class="license-close" id="license-close">关闭</button>
+    </section>
+  </div>
+</body>
+</html>

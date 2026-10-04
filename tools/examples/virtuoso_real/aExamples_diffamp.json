@@ -1,0 +1,49 @@
+{
+  "source": {"lib": "aExamples", "cell": "diffamp", "view": "schematic", "bBox": [[-3.2875, -1.3125], [0.54375, 1.10625]]},
+  "instances": [
+    {"name": "J5", "lib": "analogLib", "cell": "idc", "view": "symbol", "xy": [-0.5, -0.5], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"idc": "1m"}},
+    {"name": "I0", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [-2.625, 0.4375], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I1", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [-1.625, -0.375], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "I2", "lib": "basic", "cell": "gnd", "view": "symbol", "xy": [-0.5, -1.0625], "orient": "R0", "ninst": 1, "terms": ["gnd!"], "props": {}},
+    {"name": "E1", "lib": "analogLib", "cell": "vdc", "view": "symbol", "xy": [-2.625, 1], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"vdc": "12"}},
+    {"name": "E4", "lib": "analogLib", "cell": "vdc", "view": "symbol", "xy": [-1.625, 0.1875], "orient": "R0", "ninst": 1, "terms": ["MINUS", "PLUS"], "props": {"vdc": "5"}},
+    {"name": "R0", "lib": "aExamples", "cell": "RPLR", "view": "symbol", "xy": [-1, 1], "orient": "R0", "ninst": 1, "terms": ["PLUS", "MINUS"], "props": {"WB": "5", "Rnom": "4K"}},
+    {"name": "R1", "lib": "aExamples", "cell": "RPLR", "view": "symbol", "xy": [0, 1], "orient": "R0", "ninst": 1, "terms": ["PLUS", "MINUS"], "props": {"WB": "10", "Rnom": "4K"}},
+    {"name": "TNSA1", "lib": "aExamples", "cell": "TNSA", "view": "symbol", "xy": [-1.25, 0.1875], "orient": "R0", "ninst": 1, "terms": ["B", "E", "C"], "props": {"LE": "10", "WE": "10"}},
+    {"name": "TNSA2", "lib": "aExamples", "cell": "TNSA", "view": "symbol", "xy": [0.25, 0.1875], "orient": "MY", "ninst": 1, "terms": ["B", "E", "C"], "props": {"LE": "10", "WE": "10"}}
+  ],
+  "nets": [
+    {"name": "5", "conns": [["TNSA1", "E"], ["TNSA2", "E"], ["J5", "PLUS"]]},
+    {"name": "gnd!", "conns": [["E1", "MINUS"], ["E4", "MINUS"], ["I0", "gnd!"], ["I1", "gnd!"], ["I2", "gnd!"], ["J5", "MINUS"]]},
+    {"name": "4", "conns": [["TNSA1", "B"], ["TNSA2", "B"], ["E4", "PLUS"]]},
+    {"name": "1", "conns": [["R0", "PLUS"], ["R1", "PLUS"], ["E1", "PLUS"]]},
+    {"name": "3", "conns": [["TNSA2", "C"], ["R1", "MINUS"]]},
+    {"name": "2", "conns": [["TNSA1", "C"], ["R0", "MINUS"]]}
+  ],
+  "pins": [
+
+  ],
+  "wireShapes": [
+    {"net": "gnd!", "points": [[-0.5, -1.0625], [-0.5, -0.875]]},
+    {"net": "5", "points": [[-0.5, -0.5], [-0.5, 0]]},
+    {"net": "5", "points": [[-0.5, 0], [0, 0]]},
+    {"net": "5", "points": [[-1, 0], [-0.5, 0]]},
+    {"net": "4", "points": [[0.25, -0.25], [0.25, 0.1875]]},
+    {"net": "4", "points": [[-1.25, -0.25], [0.25, -0.25]]},
+    {"net": "4", "points": [[-1.25, -0.25], [-1.25, 0.1875]]},
+    {"net": "4", "points": [[-1.625, 0.1875], [-1.25, 0.1875]]},
+    {"net": "gnd!", "points": [[-1.625, -0.375], [-1.625, -0.1875]]},
+    {"net": "1", "points": [[-1, 1], [0, 1]]},
+    {"net": "1", "points": [[-2.625, 1], [-1, 1]]},
+    {"net": "gnd!", "points": [[-2.625, 0.4375], [-2.625, 0.625]]},
+    {"net": "3", "points": [[0, 0.375], [0, 0.625]]},
+    {"net": "2", "points": [[-1, 0.375], [-1, 0.625]]}
+  ],
+  "labels": [
+    {"text": "5", "xy": [-0.375, 0.10625], "orient": "R0", "height": 0.0625},
+    {"text": "4", "xy": [-1.4375, 0.23125], "orient": "R0", "height": 0.0625},
+    {"text": "1", "xy": [-1.375, 1.04375], "orient": "R0", "height": 0.0625},
+    {"text": "3", "xy": [-0.04375, 0.5], "orient": "R90", "height": 0.0625},
+    {"text": "2", "xy": [-1.04375, 0.5], "orient": "R90", "height": 0.0625}
+  ]
+}

@@ -16,7 +16,7 @@ graph LR
 在 `~/.cdsinit` 里加三行：
 
 ```skill
-ccRepoPath = "~/circuit-canvas"          ; 改成你的克隆路径
+ccRepoPath = "/work/agent_cowork/circuit-canvas"
 ;; ccOutputDir = "/home/me/circuit_html"     ; 默认 ~/circuit_canvas_out
 load(strcat(ccRepoPath "/virtuoso/circuit_canvas.il"))
 ```
@@ -123,7 +123,7 @@ ccSelfTest(list("training" "inv")) ; 全链路自检（含真跑一遍导出）
 
 | 变量 | 默认 | 说明 |
 |------|------|------|
-| `ccRepoPath` | `~/circuit-canvas` | circuit-canvas 仓库路径（也可用环境变量 `CC_REPO`） |
+| `ccRepoPath` | `/work/agent_cowork/circuit-canvas` | circuit-canvas 仓库路径（也可用环境变量 `CC_REPO`） |
 | `ccOutputDir` | `~/circuit_canvas_out` | HTML 输出目录 |
 | `ccPythonBin` | 自动探测 | 转换器用的 python3（默认优先 `/usr/bin/python3`） |
 | `ccAutoOpenBrowser` | `t` | 生成后自动开浏览器 |
@@ -170,27 +170,36 @@ ccSelfTest(list("training" "inv")) ; 全链路自检（含真跑一遍导出）
 - **图标栏是替换语义**（见上文安装说明）。
 - **右键菜单**依赖 Schematic Editor 已经初始化过（`schOSMCategories`），纯 CIW 启动时
   会提示跳过 —— 打开任意一个 schematic 后执行 `ccRegisterPopUpMenus()` 即可补上。
-- **`/usr/bin/Xvfb` 缺失**时 `virtuoso -nograph` 起不来。headless 跑脚本可以
-  `export CDS_XVFB_PATH=<本机某个 64 位 Xvfb 的 bin 目录>` 借用现成的 Xvfb，
-  或直接不要 `-nograph`。
-- 其它 SKILL 语言坑（`substring` 第三参是长度、没有 `explode`/`implode`、
-  `cv~>pins` 对 schematic 是 nil 等）可在调试时逐个记录。
+- **`/usr/bin/Xvfb` 缺失**时 `virtuoso -nograph` 起不来（本机就是这样）。headless 跑脚本要
+  `export CDS_XVFB_PATH=/eda/matlab/R2025b/sys/Xvfb/glnxa64/bin` 借用 MATLAB 自带的 Xvfb，
+  或直接不要 `-nograph`。`.test/run.sh` 里就是这么干的。
+- 更多 SKILL 语言坑（`substring` 第三参是长度、没有 `explode`/`implode`、
+  `cv~>pins` 对 schematic 是 nil 等）见
+  [`.github/skills/cadence-analog-ic/reference/ic25-skill-gotchas.md`](../../.github/skills/cadence-analog-ic/reference/ic25-skill-gotchas.md)。
 
-## 测试 / 回归
+## 测试
 
-`tools/examples/virtuoso_real/` 里存了 4 个真实导出样本（aExamples/diffamp、training/inv、
-training/PLL、aExamples/vcvsOpampTest）当回归数据，**不用开 Virtuoso** 也能验证转换器：
+`.test/` 里是把整套东西跑起来用的脚手架（headless，不用开 GUI）：
 
 ```bash
-for f in tools/examples/virtuoso_real/*.json; do
-  python3 tools/virtuoso-to-canvas.py "$f" --out /tmp/x.html --id t --no-js
-done
+cd circuit-canvas/virtuoso/.test
+./run.sh test_self.il                                  # 自检 + 端到端导出（推荐先跑这个）
+./run.sh probe_api.il                                  # 查 SKILL/OA API 签名与语义
+CC_LIB=aExamples CC_CELL=diffamp ./run.sh inspect_cellview.il   # 看某个 cellview 的结构
+python3 check_json.py out/*.json                       # 校验导出的 JSON
+python3 show.py out/training_inv.json                  # 看实例/端子/网络
 ```
 
-想直接在自己机器上跑 Cadence 端到端：
+`run.sh` 已经把 headless 需要的环境铺垫好了（`CDS_XVFB_PATH` 指向 MATLAB 自带的 Xvfb、
+`-cdslib` 指向测试用 `cds.lib`、stdin 接 `/dev/null`）。`cds.lib` 里定义了
+`analogLib` / `basic` / `aExamples` / `training` / `gpdk045` 五个库。
 
-1. 在 CIW 里 `load` 本目录的 `circuit_canvas.il`，执行 `ccSelfTest(list("库" "单元"))` 自检；
-2. 或先用导出脚本把 cellview 导成 JSON，再交给 `tools/virtuoso-to-canvas.py` 转换。
+`tools/examples/virtuoso_real/` 里存了 4 个真实导出样本（aExamples/diffamp、training/inv、
+training/PLL、aExamples/vcvsOpampTest）当回归数据，不用开 Virtuoso 也能验转换器：
 
-> 在 EDA 环境里调外部程序要清掉 `LD_LIBRARY_PATH`（Cadence 的老库会把系统 python 带崩），
-> 并且用绝对路径 `/usr/bin/python3`（PATH 上的 python3 可能是 Mentor 自带的）。
+```bash
+cd circuit-canvas
+for f in tools/examples/virtuoso_real/*.json; do
+  /usr/bin/python3 tools/virtuoso-to-canvas.py "$f" --out /tmp/x.html --id t --no-js
+done
+```

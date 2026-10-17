@@ -12,12 +12,12 @@
 ;;
 ;; 依赖同目录的 cc_export.il 与 <repo>/tools/virtuoso-to-canvas.py
 ;;
-;; 全部 API 用法都用 arglist() 核对过签名。
+;; 全部 API 用法都在 IC25.10 上用 arglist() 核对过签名，见 .test/ 下的探测脚本。
 
 ;; ══════════════════════════════════════════════════════════════════════
 ;; 配置（在 .cdsinit 里 load 本文件之前设置即可覆盖）
 ;; ══════════════════════════════════════════════════════════════════════
-unless( boundp('ccRepoPath)      ccRepoPath = strcat(getShellEnvVar("HOME") "/circuit-canvas") )
+unless( boundp('ccRepoPath)      ccRepoPath = "/work/agent_cowork/circuit-canvas" )
 unless( boundp('ccOutputDir)     ccOutputDir = nil )         ;; nil → ~/circuit_canvas_out
 unless( boundp('ccPythonBin)     ccPythonBin = nil )         ;; nil → 自动探测
 unless( boundp('ccAutoOpenBrowser) ccAutoOpenBrowser = t )
@@ -49,6 +49,7 @@ procedure( ccCleanEnv(s_cmd)
 procedure( ccFindRepo()
   let( (cands p)
     cands = list( getShellEnvVar("CC_REPO") ccRepoPath
+                  "/work/agent_cowork/circuit-canvas"
                   strcat(getShellEnvVar("HOME") "/circuit-canvas") )
     p = nil
     foreach( c cands

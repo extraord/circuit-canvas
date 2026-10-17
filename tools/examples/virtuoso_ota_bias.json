@@ -1,0 +1,35 @@
+{
+  "source": {"lib": "at7210_afe", "cell": "ota_5t_bias_tb", "view": "schematic"},
+  "instances": [
+    {"name": "I0", "lib": "analogLib", "cell": "idc", "xy": [1.0, 4.0], "orient": "R0", "props": {"dc": "50u"}},
+    {"name": "I1", "lib": "analogLib", "cell": "vdc", "xy": [6.0, 4.0], "orient": "R0", "props": {"dc": "0.9"}},
+    {"name": "M0", "lib": "analogLib", "cell": "pmos4", "xy": [3.0, 2.5], "orient": "R0", "props": {"w": "8u", "l": "1u"}},
+    {"name": "M1", "lib": "analogLib", "cell": "pmos4", "xy": [4.5, 2.5], "orient": "MY", "props": {"w": "8u", "l": "1u"}},
+    {"name": "M2", "lib": "analogLib", "cell": "nmos4", "xy": [3.0, 1.0], "orient": "R0", "props": {"w": "4u", "l": "1u"}},
+    {"name": "M3", "lib": "analogLib", "cell": "nmos4", "xy": [4.5, 1.0], "orient": "MY", "props": {"w": "4u", "l": "1u"}},
+    {"name": "M4", "lib": "analogLib", "cell": "nmos4", "xy": [1.0, 1.0], "orient": "R0", "props": {"w": "4u", "l": "1u"}},
+    {"name": "R0", "lib": "analogLib", "cell": "res", "xy": [6.0, 2.5], "orient": "R90", "props": {"r": "10k"}},
+    {"name": "C0", "lib": "analogLib", "cell": "cap", "xy": [6.0, 1.0], "orient": "R0", "props": {"c": "2p"}},
+    {"name": "XSPEC1", "lib": "at7210_afe", "cell": "cmp_slicer_x4", "xy": [8.0, 2.5], "orient": "R0", "props": {}},
+    {"name": "GND1", "lib": "analogLib", "cell": "gnd", "xy": [1.0, 0.5], "orient": "R0", "props": {}},
+    {"name": "GND2", "lib": "analogLib", "cell": "gnd", "xy": [6.0, 0.5], "orient": "R0", "props": {}},
+    {"name": "VDD1", "lib": "analogLib", "cell": "vdd", "xy": [3.75, 3.5], "orient": "R0", "props": {}}
+  ],
+  "nets": [
+    {"name": "vdd!", "conns": [["VDD1", "+"], ["I1", "PLUS"], ["M0", "S"], ["M0", "B"], ["M1", "S"], ["M1", "B"]]},
+    {"name": "gnd!", "conns": [["GND1", "+"], ["GND2", "+"], ["I0", "MINUS"], ["M4", "S"], ["M4", "B"], ["C0", "MINUS"]]},
+    {"name": "ibias", "conns": [["I0", "PLUS"], ["M4", "G"], ["M4", "D"]]},
+    {"name": "net12", "conns": [["M0", "G"], ["M1", "G"], ["M0", "D"]]},
+    {"name": "voutp", "conns": [["M1", "D"], ["M3", "D"], ["C0", "PLUS"], ["R0", "MINUS"]]},
+    {"name": "voutn", "conns": [["M0", "D"], ["M2", "D"]]},
+    {"name": "vip", "conns": [["M2", "G"], ["I1", "MINUS"]]},
+    {"name": "vin", "conns": [["M3", "G"]]},
+    {"name": "vcm", "conns": [["R0", "PLUS"], ["XSPEC1", "IN"]]}
+  ],
+  "pins": [
+    {"name": "VIP", "dir": "input", "net": "vip", "xy": [0.5, 1.0]},
+    {"name": "VIN", "dir": "input", "net": "vin", "xy": [5.5, 1.0]},
+    {"name": "VOUTP", "dir": "output", "net": "voutp", "xy": [7.5, 2.5]},
+    {"name": "VOUTN", "dir": "output", "net": "voutn", "xy": [2.5, 2.5]}
+  ]
+}

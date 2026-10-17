@@ -24,12 +24,29 @@
 
   const NS = 'http://www.w3.org/2000/svg';
   // ── 画布文件（canvas file）────────────────────────────────────────────
-  // 一张具体图纸（例如由 Cadence Virtuoso / Visio 导出的电路图）由
-  // tools/build-canvas-file.py 打包成「独立 HTML 画布文件」：图纸数据内嵌成
-  // window.CANVAS_FILE，整个文件可以单独拷到别的机器，只依赖公用库
-  // （styles.css / symbols.generated.js / app.js）。
-  // 通用画布 index.html 没有内嵌数据，canvasFile 为 null，走空白工程逻辑。
-  const canvasFile = window.CANVAS_FILE || null;
+  // 一张具体图纸（如 UCIe PHY 框图）有两种来源：
+  //   1. 独立 HTML 画布文件：tools/build-canvas-file.py 把图纸数据内嵌成
+  //      window.CANVAS_FILE，整个文件可以单独拷到别的机器，只依赖公用库
+  //      （styles.css / symbols.generated.js / app.js）；
+  //   2. 旧入口 index.html?ucie=sheet：从 assets/ucie-canvas.js 载入。
+  // 下面把两种来源归一到同一个 canvasFile 对象，其余逻辑只认它。
+  const ucieCanvas = new URLSearchParams(location.search).get('ucie') && window.UCIE_CANVAS ? window.UCIE_CANVAS : null;
+  // 旧入口：index.html?ucie=sheet 时读 assets/ucie-canvas.js；独立画布文件不经过这里
+  const canvasFile = window.CANVAS_FILE
+    ? window.CANVAS_FILE
+    : (ucieCanvas
+      ? {
+        id: 'ucie-sheet',
+        title: ucieCanvas.meta.name,
+        sheet: ucieCanvas.meta.page,
+        source: ucieCanvas.meta.source,
+        width: ucieCanvas.meta.width,
+        height: ucieCanvas.meta.height,
+        draft: ucieCanvas.draft,
+        residual: ucieCanvas.residual,
+        snap: ucieCanvas.snap
+      }
+      : null);
   const CANVAS_W = canvasFile ? Math.round(canvasFile.width) : 1200;
   const CANVAS_H = canvasFile ? Math.round(canvasFile.height) : 800;
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -103,6 +120,8 @@
     ruler: { title: '标尺', english: 'Ruler', glyph: '⊢⊣', width: 200, height: 26, value: '', box: [-100, -20, 200, 44], pins: [] },
     // 可调矩形：不是元件，落子时转成「图形」对象，尺寸可在属性里直接填。
     'rect-block': { title: '可调矩形', english: 'Adjustable rectangle', glyph: '▭', width: 160, height: 100, value: '', box: [-80, -50, 160, 100], pins: [] },
+    'variable-octagon': { title: '可变八边形', english: 'Variable octagon', glyph: '8', width: 120, height: 120, value: '', box: [-60, -60, 120, 120], pins: [], variableShape: 'octagon' },
+    'variable-circle': { title: '可变圆形', english: 'Variable circle', glyph: '○', width: 120, height: 120, value: '', box: [-60, -60, 120, 120], pins: [], variableShape: 'ellipse' },
     // 黑盒单元：矩形 + 每实例自定义的引脚（component.pins），引脚名写在框内。
     // 从 Virtuoso 导入时，未识别的 cell 就用它代替，不再是「跳过 + 警告」。
     block: { title: '黑盒单元', english: 'Black box cell', glyph: 'BOX', width: 160, height: 100, value: '', box: [-80, -50, 160, 100], pins: [] },
@@ -333,9 +352,11 @@
 
   function configureCanvasFile() {
     if (!canvasFile) return;
-    document.body.classList.add('canvas-edit-mode');
+    document.body.classList.add('ucie-edit-mode');
+    const htmlExportButton = $('#save-html');
+    if (htmlExportButton) htmlExportButton.hidden = !window.CANVAS_FILE;
     // 残余几何：没有被拆成画布对象的线条 / 括号 / 曲线，垫在最底层
-    const layer = $('#residual-layer');
+    const layer = $('#ucie-residual-layer');
     if (layer) {
       const NS_SVG = NS;
       for (const item of canvasFile.residual) {
@@ -345,8 +366,8 @@
         if (item.s) style += `;stroke:${item.s};stroke-width:${item.w};stroke-linejoin:round;stroke-linecap:round`;
         if (item.da) style += `;stroke-dasharray:${item.da}`;
         path.setAttribute('style', style);
-        if (item.ae) path.setAttribute('marker-end', 'url(#residual-arrow)');
-        if (item.ab) path.setAttribute('marker-start', 'url(#residual-arrow)');
+        if (item.ae) path.setAttribute('marker-end', 'url(#ucie-arrow)');
+        if (item.ab) path.setAttribute('marker-start', 'url(#ucie-arrow)');
         layer.append(path);
       }
     }
@@ -357,17 +378,16 @@
     if (nameField && canvasFile.source) nameField.title = `${canvasFile.source} · ${canvasFile.sheet || ''}`.trim();
     const paper = $('.canvas-paper');
     if (paper) paper.style.aspectRatio = `${CANVAS_W} / ${CANVAS_H}`;
-    const toggle = $('#toggle-residual');
-    toggle.hidden = false;
+    const toggle = $('#toggle-ucie-reference');
+    toggle.hidden = !canvasFile.residual?.length;
     toggle.querySelector('span:last-child').textContent =
       `隐藏${canvasFile.residualLabel || '残余几何'}`;
     toggle.title = canvasFile.residualLabel
       ? `原图里的走线（忠实搬运）；关掉后可看到由引脚位置自动生成的走线`
       : 'Visio 里没被拆成画布对象的线条';
-    // 回到通用画布：独立画布文件里给顶栏放一个「通用画布」入口
-    const sheetLink = $('#open-home-sheet');
+    // 打开别的画布 / 回到通用画布：独立画布文件可能不叫 ucie.html
+    const sheetLink = $('#open-ucie-sheet');
     if (sheetLink) {
-      sheetLink.hidden = false;
       sheetLink.href = './index.html';
       sheetLink.title = '返回通用电路画布';
       sheetLink.querySelector('span:last-child').textContent = '通用画布';
@@ -387,10 +407,10 @@
   }
 
   /** 画布文件的初始图纸（Visio sheet 拆出来的可编辑对象）。 */
-  const canvasDraft = () => validateProject(clone(canvasFile.draft));
+  const ucieDraft = () => validateProject(clone(canvasFile.draft));
 
   // 残余连线的端点 / 矩形角点：作为拖拽吸附点，让新元件能对齐到既有走线上。
-  const canvasSnapPoints = canvasFile && Array.isArray(canvasFile.snap)
+  const ucieSnapPoints = canvasFile && Array.isArray(canvasFile.snap)
     ? canvasFile.snap.map(point => ({ x: point[0], y: point[1] }))
     : [];
 
@@ -434,6 +454,7 @@
     const data = JSON.parse(raw);
     project = data.project;
     idCounter = data.idCounter;
+    labelPreview = null;
     clearSelection();
     wireStart = null;
     renderAll();
@@ -716,7 +737,7 @@
   }
 
   // ── 落点吸引与对齐参考线 ─────────────────────────────────────────────────
-  // 画布文件按 1/8 英寸网格（0.125 in × 72 = 9）落点，便于手工微调。
+  // UCIe 模式按 Visio 的 1/8 英寸网格（0.125 in × 72 = 9）落点，便于手工微调。
   const GRID = canvasFile ? 9 : 10;
   const ZOOM_MIN = canvasFile ? 0.2 : 0.35;
   const ZOOM_MAX = canvasFile ? 6 : 2.4;
@@ -771,8 +792,8 @@
       if (shape.id === skipId) continue;
       points.push(...shapeAnchors(shape));
     }
-    // 画布编辑模式：残余连线的端点 / 矩形角点也能吸附，方便新元件接到既有线上
-    if (canvasSnapPoints.length) points.push(...canvasSnapPoints);
+    // UCIe 编辑模式：残余连线的端点 / 矩形角点也能吸附，方便新元件接到既有线上
+    if (ucieSnapPoints.length) points.push(...ucieSnapPoints);
     points.push({ x: CANVAS_W / 2, y: CANVAS_H / 2 });
     return points;
   }
@@ -867,8 +888,12 @@
   ];
   const SHAPE_KINDS = {
     rectangle: ['矩形', 'Rectangle'],
+    image: ['图片', 'Image'],
     'rounded-rect': ['圆角矩形', 'Rounded rectangle'],
     'dashed-rect': ['虚线框', 'Dashed frame'],
+    freeform: ['自由路径', 'Freeform path'],
+    'free-line': ['自由直线', 'Free line'],
+    'free-curve': ['自由曲线', 'Free curve'],
     ellipse: ['椭圆 / 圆', 'Ellipse / circle'],
     triangle: ['三角形', 'Triangle'],
     'right-triangle': ['直角三角形', 'Right triangle'],
@@ -885,6 +910,7 @@
     line: ['直线', 'Line']
   };
   let shapeKind = 'rectangle';
+  const nextShapeOrder = () => project.shapes.reduce((order, shape) => Math.max(order, Number(shape.order) || 0), 0) + 1;
 
   // 图形填充：'none' 表示无填充（透明），其余是十六进制色值。
   // 用内联 style 写 fill，而不是 fill 属性——presentation 属性优先级最低，
@@ -903,18 +929,20 @@
   const shapeFillStyle = (kind, fill) => (kind === 'line' || sanitizeShapeFill(fill) === SHAPE_FILL_NONE ? '' : ` style="fill:${sanitizeShapeFill(fill)}"`);
   /**
    * 图形内联样式：填充之外还支持可选的描边色 (stroke) 与线宽 (sw)，
-   * 画布编辑模式用它们还原原图里的黑色 / 蓝色细线。
+   * UCIe 编辑模式用它们还原 Visio 里的黑色 / 蓝色细线。
    */
   function shapeStyleAttr(shape) {
     const parts = [];
     if (shape.kind !== 'line' && sanitizeShapeFill(shape.fill) !== SHAPE_FILL_NONE) parts.push(`fill:${sanitizeShapeFill(shape.fill)}`);
     if (isHexColor(shape.stroke)) parts.push(`stroke:${String(shape.stroke).toLowerCase()}`);
+    else if (shape.strokeNone) parts.push('stroke:none');
     const sw = Number(shape.sw);
     if (Number.isFinite(sw) && sw > 0) parts.push(`stroke-width:${sw}`);
     return parts.length ? ` style="${parts.join(';')}"` : '';
   }
   let shapeFill = SHAPE_FILL_NONE; // 记住上次用过的填充色，新建图形沿用
   let fillPreview = null; // 取色器拖拽中的原始填充色（仅在首次 input 时记一次撤销点）
+  let labelPreview = null;
 
   const round2 = value => Math.round(value * 100) / 100;
 
@@ -993,11 +1021,12 @@
   // 标尺的画布长度 = 长度 × 比例；属性面板里可改「长度 / 比例 / 单位」。
   const RULER_LENGTH = 100;
   const RULER_SCALE = 1.5;
+  const RULER_MIN_LENGTH = 0.001;
   const RULER_STEPS = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000, 10000, 20000, 50000];
 
-  const rulerLengthOf = component => Math.max(1, Number(component?.length) || RULER_LENGTH);
+  const rulerLengthOf = component => clamp(Number(component?.length) || RULER_LENGTH, RULER_MIN_LENGTH, 100000);
   const rulerScaleOf = component => Math.max(0.01, Number(component?.scale) || RULER_SCALE);
-  const rulerSpanOf = component => Math.max(24, rulerLengthOf(component) * rulerScaleOf(component));
+  const rulerSpanOf = component => Math.max(0.000001, rulerLengthOf(component) * rulerScaleOf(component));
   const rulerUnitOf = component => (component?.unit ? String(component.unit).slice(0, 8) : '');
 
   /** 刻度步长：保证相邻刻度在画布上至少间隔 7 个单位。 */
@@ -1007,7 +1036,7 @@
     return RULER_STEPS[RULER_STEPS.length - 1];
   }
 
-  /** 标尺图形：尺身 + 主次刻度 + 两端与数值标注。 */
+  /** 标尺图形：细基线 + 主次刻度 + 数值标注。 */
   function rulerMarkup(component) {
     const span = rulerSpanOf(component);
     const half = span / 2;
@@ -1015,20 +1044,20 @@
     const total = rulerLengthOf(component);
     const step = rulerStepOf(component);
     const unit = rulerUnitOf(component);
-    const top = -8;
-    const base = 8;
+    const displayTotal = Number.isInteger(total) ? String(total) : String(Number(total.toPrecision(8)));
     const out = [];
-    out.push(`<rect class="ruler-hit" x="${round2(-half)}" y="${round2(top - 6)}" width="${round2(span)}" height="${round2(base - top + 12)}"/>`);
-    out.push(`<rect class="ruler-body" x="${round2(-half)}" y="${round2(top)}" width="${round2(span)}" height="${round2(base - top)}"/>`);
+    const hitSpan = Math.max(span, 16 * canvasUnitsPerPixel());
+    out.push(`<rect class="ruler-hit" x="${round2(-hitSpan / 2)}" y="-12" width="${round2(hitSpan)}" height="24"/>`);
+    out.push(`<line class="ruler-axis" x1="${round2(-half)}" y1="0" x2="${round2(half)}" y2="0"/>`);
     let index = 0;
     for (let value = 0; value <= total + step * 1e-3 && index < 400; value += step) {
       const x = round2(-half + value * scale);
       const major = index % 5 === 0;
-      out.push(`<line class="ruler-tick${major ? ' major' : ''}" x1="${x}" y1="${round2(top)}" x2="${x}" y2="${round2(top + (major ? 11 : 6))}"/>`);
+      out.push(`<line class="ruler-tick${major ? ' major' : ''}" x1="${x}" y1="0" x2="${x}" y2="${major ? 8 : 4}"/>`);
       index += 1;
     }
-    out.push(`<line class="ruler-tick major" x1="${round2(half)}" y1="${round2(top)}" x2="${round2(half)}" y2="${round2(top + 11)}"/>`);
-    out.push(`<text class="ruler-label" x="0" y="${round2(top - 8)}" text-anchor="middle">${escapeHtml(`${round2(total)}${unit ? ' ' + unit : ''}`)}</text>`);
+    out.push(`<line class="ruler-tick major" x1="${round2(half)}" y1="0" x2="${round2(half)}" y2="8"/>`);
+    out.push(`<text class="ruler-label" x="0" y="-8" text-anchor="middle">${escapeHtml(`${displayTotal}${unit ? ' ' + unit : ''}`)}</text>`);
     return out.join('');
   }
 
@@ -1046,15 +1075,7 @@
 
   // 标尺拖拽缩放：拖任一端的手柄，另一端固定不动，鼠标在尺身轴线上的投影
   // 就是新的画布长度，再按「比例」换算回刻度值写进 length。
-  const RULER_MIN_SPAN = 24;
   const RULER_MAX_SPAN = 100000;
-  /** 保留三位有效数字，避免拖动时长度出现一长串小数。 */
-  function niceRulerLength(value) {
-    const safe = Math.max(0.01, Number(value) || 0);
-    const step = Math.pow(10, Math.floor(Math.log10(safe)) - 2);
-    return round2(Math.round(safe / step) * step);
-  }
-
   /** 选中标尺时，在尺身两端各画一个方形控制点。 */
   function appendRulerHandles(component) {
     const size = 9 * canvasUnitsPerPixel();
@@ -1304,11 +1325,125 @@
     const cls = dashed ? 'shape shape-dashed' : 'shape';
     const box = `x="${round2(x)}" y="${round2(y)}" width="${round2(w)}" height="${round2(h)}"`;
     const paint = shapeStyleAttr(shape);
-    if (shape.kind === 'rectangle' || dashed) return `<rect class="${cls}" ${box}${paint}/>`;
+    if (shape.kind === 'image') {
+      const source = /^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(shape.imageData || '') ? shape.imageData : '';
+      const positioning = `translate(${x} ${y}) scale(${w / shape.imageBoundsWidth} ${h / shape.imageBoundsHeight}) translate(${-shape.imageOriginX} ${-shape.imageOriginY})`;
+      const transform = shape.imageTransform ? ` transform="${positioning} ${escapeHtml(shape.imageTransform)}"` : '';
+      const imageBox = shape.imageTransform ? `x="0" y="0" width="${shape.imageWidth}" height="${shape.imageHeight}"` : box;
+      return `<image ${imageBox} href="${source}" preserveAspectRatio="none"${transform}/>`;
+    }
+    if (shape.kind === 'free-line') return `<path class="${cls}" d="M ${x} ${y} L ${x + w} ${y + h}"${paint}/>`;
+    if (shape.kind === 'free-curve') return `<path class="${cls}" d="M ${x} ${y} C ${x + w * 0.25} ${y} ${x + w * 0.75} ${y + h} ${x + w} ${y + h}"${paint}/>`;
+    if (shape.kind === 'freeform') {
+      const dash = shape.dash ? ` stroke-dasharray="${shape.dash}"` : '';
+      const begin = shape.beginArrow ? ' marker-start="url(#ucie-arrow)"' : '';
+      const end = shape.endArrow ? ' marker-end="url(#ucie-arrow)"' : '';
+      return `<path class="${cls}" d="${escapeHtml(shape.path || '')}"${paint}${dash}${begin}${end}/>`;
+    }
+    if (shape.kind === 'rectangle' || dashed) {
+      const rectangle = `<rect class="${cls}" ${box}${paint}/>`;
+      return `${rectangle}${shape.blockLabel ? shapeLabelMarkup(shape) : ''}`;
+    }
     if (shape.kind === 'rounded-rect') return `<rect class="${cls}" ${box} rx="${round2(Math.min(w, h) * 0.16)}"${paint}/>`;
-    if (shape.kind === 'ellipse') return `<ellipse class="${cls}" cx="${round2(x + w / 2)}" cy="${round2(y + h / 2)}" rx="${round2(w / 2)}" ry="${round2(h / 2)}"${paint}/>`;
+    if (shape.kind === 'ellipse') return `<ellipse class="${cls}" cx="${round2(x + w / 2)}" cy="${round2(y + h / 2)}" rx="${round2(w / 2)}" ry="${round2(h / 2)}"${paint}/>${shape.blockLabel ? shapeLabelMarkup(shape) : ''}`;
     const data = shapePath(shape.kind, x, y, w, h);
-    return data ? `<path class="${cls}" d="${data}"${paint}/>` : '';
+    return data ? `<path class="${cls}" d="${data}"${paint}/>${shape.blockLabel ? shapeLabelMarkup(shape) : ''}` : '';
+  }
+
+  function shapeLabelMarkup(shape) {
+    const label = String(shape.label || '').trim();
+    const variableDiameter = shape.kind === 'octagon' || shape.variableDiameter;
+    const width = variableDiameter ? widthOf(shape) * 0.78 : widthOf(shape) - 24;
+    const height = variableDiameter ? heightOf(shape) * 0.7 : heightOf(shape) - 20;
+    if (!label || width < 12 || height < 12) return '';
+    const fontFamily = '"Aptos", "Microsoft YaHei", sans-serif';
+    const metrics = shapeLabelMarkup.metrics || (shapeLabelMarkup.metrics = document.createElement('canvas').getContext('2d'));
+    if (!metrics) return '';
+    let sourceLines = Array.isArray(shape.labelLines) && shape.labelLines.length
+      ? shape.labelLines.map(line => String(line || '').trim()).filter(Boolean)
+      : label.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (sourceLines.length > 2) sourceLines = [sourceLines[0], sourceLines.slice(1).join(' ')];
+    if (!sourceLines.length) return '';
+    if (shape.labelDimension && sourceLines.length > 1) {
+      const dimension = shape.labelDimension;
+      const precision = value => Number(value).toFixed(0);
+      const scaledWidth = dimension.width * widthOf(shape) / dimension.baseWidth;
+      const scaledHeight = dimension.height * heightOf(shape) / dimension.baseHeight;
+      sourceLines[1] = `${precision(scaledWidth)}${dimension.separator}${precision(scaledHeight)}`;
+    } else if (shape.labelScaleBaseDiameter > 0 && sourceLines.length > 1) {
+      const scale = widthOf(shape) / shape.labelScaleBaseDiameter;
+      sourceLines[1] = sourceLines[1].replace(/\d+(?:\.\d+)?/g, value => {
+        const decimals = value.split('.')[1]?.length || 0;
+        const scaled = Number(value) * scale;
+        return decimals ? String(Number(scaled.toFixed(decimals))) : String(Math.round(scaled));
+      });
+    }
+    let fontSize = Math.min(36, width * 0.22, height * 0.28);
+    let lines = sourceLines;
+    let lineHeight = fontSize * 1.28;
+    while (fontSize >= 5) {
+      metrics.font = `600 ${fontSize}px ${fontFamily}`;
+      lines = sourceLines.length > 1 ? sourceLines : splitLabelInTwo(sourceLines[0], metrics, width);
+      lineHeight = fontSize * 1.28;
+      const widestLine = Math.max(...lines.map(line => metrics.measureText(line).width));
+      if (widestLine <= width && lines.length * lineHeight <= height) break;
+      fontSize -= 0.5;
+    }
+    fontSize = Math.max(5, fontSize);
+    metrics.font = `600 ${fontSize}px ${fontFamily}`;
+    lines = sourceLines.length > 1 ? sourceLines : splitLabelInTwo(sourceLines[0], metrics, width);
+    lineHeight = fontSize * 1.28;
+    const centerX = round2(shape.x + shape.width / 2);
+    const centerY = round2(shape.y + shape.height / 2);
+    const firstDy = round2(-((lines.length - 1) * lineHeight) / 2);
+    const tspans = lines.map((line, index) => {
+      const measuredWidth = metrics.measureText(line).width;
+      const fit = measuredWidth > width ? ` textLength="${round2(width)}" lengthAdjust="spacingAndGlyphs"` : '';
+      return `<tspan x="${centerX}" dy="${index === 0 ? firstDy : round2(lineHeight)}"${fit}>${escapeHtml(line)}</tspan>`;
+    }).join('');
+    return `<text class="shape-label" x="${centerX}" y="${centerY}" style="font-size:${round2(fontSize)}px;fill:${shapeLabelColor(shape)}">${tspans}</text>`;
+  }
+
+  function widthOf(shape) { return Math.abs(Number(shape.width) || 0); }
+  function heightOf(shape) { return Math.abs(Number(shape.height) || 0); }
+
+  function splitLabelInTwo(label, metrics, maxWidth) {
+    if (metrics.measureText(label).width <= maxWidth) return [label];
+    const characters = Array.from(label);
+    let split = 1;
+    while (split < characters.length && metrics.measureText(characters.slice(0, split + 1).join('')).width <= maxWidth) split += 1;
+    const wordBoundary = characters.slice(0, split).join('').lastIndexOf(' ');
+    if (wordBoundary > 0) split = Array.from(characters.slice(0, split).join('').slice(0, wordBoundary + 1)).length;
+    return [characters.slice(0, split).join('').trimEnd(), characters.slice(split).join('').trimStart()];
+  }
+
+  function shapeLabelColor(shape) {
+    const fill = sanitizeShapeFill(shape.fill);
+    if (!isHexColor(fill)) return '#33483e';
+    const channels = [1, 3, 5].map(offset => parseInt(fill.slice(offset, offset + 2), 16) / 255);
+    const luminance = channels.map(channel => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+      .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+    return luminance < 0.38 ? '#ffffff' : '#33483e';
+  }
+
+  function updateOctagonLabel(shape) {
+    const lines = String(shape.label || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    shape.labelLines = lines.length > 2 ? [lines[0], lines.slice(1).join(' ')] : lines;
+    const dimension = shape.labelLines.length > 1
+      ? shape.labelLines[1].match(/^\s*(\d+(?:\.\d+)?)\s*([*x×])\s*(\d+(?:\.\d+)?)\s*$/i)
+      : null;
+    shape.labelScaleBaseDiameter = shape.width;
+    if (!dimension || shape.width <= 0 || shape.height <= 0) {
+      delete shape.labelDimension;
+      return;
+    }
+    shape.labelDimension = {
+      width: Number(dimension[1]),
+      height: Number(dimension[3]),
+      baseWidth: shape.width,
+      baseHeight: shape.height,
+      separator: dimension[2]
+    };
   }
 
   /** 修改当前选中图形的填充色；色板与取色器共用。 */
@@ -1515,16 +1650,28 @@
     const byId = new Map(project.components.map(component => [component.id, component]));
 
     // 图形画在最底层，当作框图 / 分组框使用。
-    for (const shape of project.shapes) {
+    const orderedShapes = [...project.shapes].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    for (const shape of orderedShapes) {
       const group = svgElement('g', {
         'data-shape-id': shape.id,
         class: `shape-group${isSelected('shape', shape.id) ? ' selected' : ''}`
       });
+      if (shape.kind === 'freeform') {
+        group.setAttribute('transform', `translate(${round2(shape.x - shape.pathX)} ${round2(shape.y - shape.pathY)})`);
+      }
       group.innerHTML = shapeMarkup(shape);
-      // 描边很细，另叠一个透明命中矩形，让图形任意位置都能拖动。
-      group.append(svgElement('rect', {
-        x: shape.x, y: shape.y, width: shape.width, height: shape.height, class: 'shape-hit'
-      }));
+      if (shape.kind === 'freeform') {
+        group.append(svgElement('path', {
+          d: shape.path,
+          class: 'shape-hit',
+          style: `fill:#fff;fill-opacity:0;stroke:#fff;stroke-opacity:0;stroke-width:${Math.max(Number(shape.sw) || 0, 8 * canvasUnitsPerPixel())};pointer-events:${shape.fill && shape.fill !== 'none' ? 'all' : 'stroke'}`
+        }));
+      } else {
+        // 描边很细，另叠一个透明命中矩形，让图形任意位置都能拖动。
+        group.append(svgElement('rect', {
+          x: shape.x, y: shape.y, width: shape.width, height: shape.height, class: 'shape-hit'
+        }));
+      }
       group.addEventListener('pointerdown', event => beginShapePointer(event, shape));
       shapeLayer.append(group);
     }
@@ -1559,6 +1706,8 @@
       if (isHexColor(text.color)) textStyle.push(`fill:${String(text.color).toLowerCase()}`);
       // 内联字号：.annotation 的 font 简写会盖掉 font-size 属性
       if (Number(text.size) > 0) textStyle.push(`font-size:${Number(text.size)}px`);
+      if (text.bold) textStyle.push('font-weight:700');
+      if (project.preserveVisioOrder && text.angle) attrs.transform = `rotate(${text.angle} ${text.x} ${text.y})`;
       if (textStyle.length) attrs.style = textStyle.join(';');
       const label = svgElement('text', attrs);
       label.textContent = text.text;
@@ -1572,6 +1721,13 @@
         if (field) field.focus();
       });
       textLayer.append(group);
+    }
+
+    if (project.preserveVisioOrder) {
+      const orders = new Map([...project.shapes, ...project.texts].map(item => [item.id, item.order ?? 0]));
+      const nodes = [...shapeLayer.children, ...textLayer.children];
+      nodes.sort((first, second) => orders.get(first.dataset.shapeId || first.dataset.textId) - orders.get(second.dataset.shapeId || second.dataset.textId));
+      shapeLayer.append(...nodes);
     }
 
     for (const component of project.components) {
@@ -1659,7 +1815,7 @@
 
     if (selection.length === 1 && selected?.kind === 'shape') {
       const shape = project.shapes.find(item => item.id === selected.id);
-      if (shape) appendShapeHandles(shape);
+      if (shape && shape.kind !== 'freeform') appendShapeHandles(shape);
     } else if (selection.length === 1 && selected?.kind === 'component') {
       const component = byId.get(selected.id);
       if (component?.type === 'ruler') appendRulerHandles(component);
@@ -1706,7 +1862,7 @@
   // ── 滚动条 ───────────────────────────────────────────────────────────────
   // 画布用 viewBox 做缩放/平移，所以滚动条得自己画（位置、滑块长度都跟 viewBox 联动）：
   // 拖滑块 / 点轨道 → 改 viewBox；缩放到装得下时自动隐藏。
-  // ⚠️ app.js 是所有外壳共用的运行期（index.html / 生成的画布文件），
+  // ⚠️ app.js 是所有外壳共用的运行期（index.html / ucie.html / 生成的画布文件），
   //    老外壳里没有这套 DOM，**缺了必须静默跳过** —— 曾经因为没判空，一个
   //    null.addEventListener 就把整个 app.js 打断，页面看着“被破坏了”。
   const scrollAxis = {
@@ -1789,7 +1945,7 @@
     bar.addEventListener('pointerup', stop);
     bar.addEventListener('pointercancel', stop);
   }
-  // 外壳没带滚动条 DOM 就直接不绑（老画布文件属这种情况）
+  // 外壳没带滚动条 DOM 就直接不绑（老画布文件 / ucie.html 都属这种情况）
   for (const axis of ['x', 'y']) {
     const item = scrollAxis[axis];
     if (item.bar && item.thumb) bindScrollbar(item.bar, item.thumb, axis);
@@ -2124,7 +2280,7 @@
       const spec = partSpecs[component.type];
       // 标尺：长度 / 比例 / 单位 三个专属字段
       const rulerFields = component.type === 'ruler'
-        ? `<div class="field"><label for="property-length">长度</label><input id="property-length" data-property="length" type="number" min="1" step="1" value="${round2(rulerLengthOf(component))}"><span class="field-note">标尺表示的数值，例如 500；也可拖尺子两端的手柄直接改</span></div>
+        ? `<div class="field"><label for="property-length">长度</label><input id="property-length" data-property="length" type="number" min="${RULER_MIN_LENGTH}" step="0.0001" value="${rulerLengthOf(component)}"><span class="field-note">标尺表示的数值，例如 0.5；可拖端点按比例连续调整</span></div>
         <div class="field"><label for="property-scale">比例</label><input id="property-scale" data-property="scale" type="number" min="0.01" step="0.1" value="${round2(rulerScaleOf(component))}"><span class="field-note">1 个单位 = 多少画布单位；当前绘制 ${Math.round(rulerSpanOf(component))} 单位</span></div>
         <div class="field"><label for="property-unit">单位</label><input id="property-unit" data-property="unit" maxlength="8" value="${escapeHtml(rulerUnitOf(component))}" placeholder="μm / ps / mm"></div>`
         : '';
@@ -2151,17 +2307,26 @@
       const [title, english] = SHAPE_KINDS[shape.kind] || ['图形', 'Shape'];
       const currentFill = sanitizeShapeFill(shape.fill);
       const swatches = SHAPE_FILLS.map(([value, label]) => `<button type="button" class="fill-swatch${value === SHAPE_FILL_NONE ? ' fill-none' : ''}${value === currentFill ? ' active' : ''}" data-shape-fill="${value}" title="${escapeHtml(label)}" aria-label="填充色 ${escapeHtml(label)}"${value === SHAPE_FILL_NONE ? '' : ` style="background:${value}"`}></button>`).join('');
-      const fillField = shape.kind === 'line'
+      const fillField = shape.kind === 'image'
+        ? '<div class="field"><span class="field-note">Visio 原始图片</span></div>'
+        : shape.kind === 'line'
         ? '<div class="field"><label>填充颜色</label><span class="field-note">直线没有内部区域，因此不填充。想画色块可以改用矩形。' + '</span></div>'
         : `<div class="field"><label>填充颜色</label>
           <div class="fill-swatches">${swatches}</div>
           <div class="value-row fill-custom"><input id="shape-fill" type="color" value="${currentFill === SHAPE_FILL_NONE ? '#ffffff' : currentFill}" aria-label="自定义填充颜色"><span class="field-note">第一格是「无填充（透明）」，其余为常用色；点击左边小方块可用取色器选任意颜色。</span></div></div>`;
+      const isVariableDiameter = shape.kind === 'octagon' || shape.variableDiameter;
+      const dimensionFields = isVariableDiameter
+        ? `<div class="field"><label for="shape-diameter">直径</label><input id="shape-diameter" data-property="diameter" type="number" min="${SHAPE_MIN}" step="1" value="${round2(shape.width)}"><span class="field-note">${shape.kind === 'octagon' ? '八边形保持正形' : '圆形保持等径'}；拖动控制点会同步调整直径。</span></div>`
+        : `<div class="field"><label for="shape-width">宽度</label><input id="shape-width" data-property="width" type="number" min="1" step="1" value="${round2(shape.width)}"></div>
+        <div class="field"><label for="shape-height">高度</label><input id="shape-height" data-property="height" type="number" min="1" step="1" value="${round2(shape.height)}"><span class="field-note">也可以直接拖四角或四边控制点缩放。</span></div>`;
       inspector.innerHTML = `<div class="property-form"><div class="property-type"><span class="property-symbol">▱</span><div><strong>${escapeHtml(title)}</strong><small>${escapeHtml(english)}</small></div></div>
         <div class="field"><span class="unit">位置 X ${Math.round(shape.x)} · Y ${Math.round(shape.y)}</span></div>
-        <div class="field"><label for="shape-width">宽度</label><input id="shape-width" data-property="width" type="number" min="1" step="1" value="${round2(shape.width)}"></div>
-        <div class="field"><label for="shape-height">高度</label><input id="shape-height" data-property="height" type="number" min="1" step="1" value="${round2(shape.height)}"><span class="field-note">也可以直接拖四角控制点缩放。</span></div>
+        ${shape.blockLabel ? `<div class="field"><label for="shape-label">框内文字</label><textarea id="shape-label" data-property="label" maxlength="120" placeholder="输入要显示在${isVariableDiameter ? (shape.kind === 'octagon' ? '八边形' : '圆形') : '矩形'}中的文字">${escapeHtml(shape.label || '')}</textarea><span class="field-note">${isVariableDiameter ? '最多两行；第二行数字会按直径同比例变化。' : '文字居中换行，字号会随矩形大小自动适配。'}</span></div>` : ''}
+        ${shape.kind === 'freeform'
+          ? `<div class="field"><span class="unit">原始轮廓 · ${Math.round(shape.width)} × ${Math.round(shape.height)}</span></div>${fillField}<span class="field-note">拖动自由路径可移动；原始轮廓保持不变。</span>`
+          : `${dimensionFields}
         ${fillField}
-        <span class="field-note">拖动图形可移动；拖四角或四边的控制点可缩放，两者都会吸附网格与其它对象。</span>
+        <span class="field-note">拖动图形可移动；拖四角或四边的控制点可缩放，两者都会吸附网格与其它对象。</span>`}
         <button class="delete-button" data-action="delete"><span>删除图形</span><span>×</span></button></div>`;
     } else {
       const wire = project.wires.find(item => item.id === selected.id);
@@ -2196,17 +2361,21 @@
       select: '点击选中 · 空白处拖框多选（Shift 加减选）· Ctrl+点击穿透下层',
       wire: '依次点击两个引脚完成连接 · Esc 取消',
       text: '点击画布任意位置放置文字标注',
-      shape: `在画布上拖动绘制${(SHAPE_KINDS[shapeKind] || SHAPE_KINDS.rectangle)[0]} · 选中后可在右侧改填充色`
+      'free-line': '拖动绘制自由直线 · 松开后可选中和移动',
+      'free-curve': '按住鼠标自由绘制平滑曲线 · 松开后可选中和移动',
+      shape: shapeKind === 'free-curve' ? '按住鼠标自由绘制平滑曲线 · 松开后可选中和移动'
+        : shapeKind === 'free-line' ? '拖动绘制自由直线 · 松开后可选中和移动'
+          : `在画布上拖动绘制${(SHAPE_KINDS[shapeKind] || SHAPE_KINDS.rectangle)[0]} · 选中后可在右侧改填充色`
     };
     $('#canvas-hint').textContent = hints[nextTool] || '';
-    canvas.style.cursor = nextTool === 'wire' ? 'crosshair' : nextTool === 'text' ? 'text' : nextTool === 'shape' ? 'crosshair' : 'default';
+    canvas.style.cursor = nextTool === 'wire' ? 'crosshair' : nextTool === 'text' ? 'text' : ['shape', 'free-line', 'free-curve'].includes(nextTool) ? 'crosshair' : 'default';
     renderScene();
   }
 
   /** 选中一种图形并切到绘制模式。 */
-  function setShapeTool(kind) {
+  function setShapeTool(kind, drawTool = 'shape') {
     if (SHAPE_KINDS[kind]) shapeKind = kind;
-    setTool('shape');
+    setTool(drawTool);
     toast(`${SHAPE_KINDS[shapeKind][0]}：在画布上拖动绘制`);
   }
 
@@ -2242,6 +2411,7 @@
     if (!spec) return;
     // 可调矩形落到画布上是「图形」对象，尺寸可以在属性里直接填
     if (type === 'rect-block') { addBlockShape(x, y); return; }
+    if (spec.variableShape) { addVariableDiameterShape(spec.variableShape, x, y); return; }
     saveHistory();
     const gridX = snapToGrid(clamp(x, 24, CANVAS_W - 24));
     const gridY = snapToGrid(clamp(y, 24, CANVAS_H - 24));
@@ -2280,13 +2450,30 @@
     const shape = {
       id: newId('s'), kind: 'rectangle',
       x: cx - width / 2, y: cy - height / 2, width, height,
-      fill: shapeFill
+      fill: shapeFill, order: nextShapeOrder(), blockLabel: true, label: ''
     };
     project.shapes.push(shape);
     selectOne('shape', shape.id);
     setTool('select');
     changed();
     toast('已放置可调矩形，可在右侧填写宽度 / 高度');
+  }
+
+  function addVariableDiameterShape(kind, x, y) {
+    saveHistory();
+    const diameter = 120;
+    const cx = snapToGrid(clamp(x, 24, CANVAS_W - 24));
+    const cy = snapToGrid(clamp(y, 24, CANVAS_H - 24));
+    const shape = {
+      id: newId('s'), kind, x: cx - diameter / 2, y: cy - diameter / 2,
+      width: diameter, height: diameter, fill: shapeFill, order: nextShapeOrder(),
+      blockLabel: true, variableDiameter: true, label: '', labelLines: []
+    };
+    project.shapes.push(shape);
+    selectOne('shape', shape.id);
+    setTool('select');
+    changed();
+    toast(`已放置${kind === 'octagon' ? '可变八边形' : '可变圆形'}，可编辑直径与框内文字`);
   }
 
   function addText(x, y) {
@@ -2415,14 +2602,64 @@
 
   /** 在画布上拖出一个新图形。 */
   function beginShapeDraw(point) {
+    if (shapeKind === 'free-line' || shapeKind === 'free-curve') {
+      saveHistory();
+      const shape = {
+        id: newId('s'), kind: 'freeform', x: point.x, y: point.y, width: 0, height: 0,
+        path: 'M 0 0 L 0 0', pathX: 0, pathY: 0, fill: 'none',
+        stroke: '#4a6157', sw: 2.4, order: nextShapeOrder()
+      };
+      project.shapes.push(shape);
+      selectOne('shape', shape.id);
+      drag = {
+        kind: 'freeform-draw', id: shape.id, mode: shapeKind,
+        points: shapeKind === 'free-line'
+          ? [{ x: point.x, y: point.y }, { x: point.x, y: point.y }]
+          : [{ x: point.x, y: point.y }],
+        originX: point.x, originY: point.y, moved: false
+      };
+      renderScene();
+      return;
+    }
     const x = snapToGrid(point.x);
     const y = snapToGrid(point.y);
     saveHistory();
-    const shape = { id: newId('s'), kind: shapeKind, x, y, width: 0, height: 0, fill: shapeFill };
+    const shape = { id: newId('s'), kind: shapeKind, x, y, width: 0, height: 0, fill: shapeFill, order: nextShapeOrder(), ...(shapeKind === 'octagon' ? { blockLabel: true, label: '' } : {}) };
     project.shapes.push(shape);
     selectOne('shape', shape.id);
     drag = { kind: 'shape-draw', id: shape.id, originX: x, originY: y, moved: false };
     renderScene();
+  }
+
+  function updateFreeformShape(shape, points, mode) {
+    const minX = Math.min(...points.map(point => point.x));
+    const minY = Math.min(...points.map(point => point.y));
+    const local = points.map(point => ({ x: point.x - minX, y: point.y - minY }));
+    let path = `M ${round2(local[0].x)} ${round2(local[0].y)}`;
+    if (mode === 'free-line' || local.length === 2) {
+      path += ` L ${round2(local[local.length - 1].x)} ${round2(local[local.length - 1].y)}`;
+    } else {
+      for (let index = 0; index < local.length - 1; index += 1) {
+        const p0 = local[Math.max(0, index - 1)];
+        const p1 = local[index];
+        const p2 = local[index + 1];
+        const p3 = local[Math.min(local.length - 1, index + 2)];
+        const c1x = p1.x + (p2.x - p0.x) / 6;
+        const c1y = p1.y + (p2.y - p0.y) / 6;
+        const c2x = p2.x - (p3.x - p1.x) / 6;
+        const c2y = p2.y - (p3.y - p1.y) / 6;
+        path += ` C ${round2(c1x)} ${round2(c1y)} ${round2(c2x)} ${round2(c2y)} ${round2(p2.x)} ${round2(p2.y)}`;
+      }
+    }
+    const xs = points.map(point => point.x);
+    const ys = points.map(point => point.y);
+    shape.x = minX;
+    shape.y = minY;
+    shape.width = Math.max(...xs) - minX;
+    shape.height = Math.max(...ys) - minY;
+    shape.pathX = 0;
+    shape.pathY = 0;
+    shape.path = path;
   }
 
   /** 拖动整个图形。 */
@@ -2509,6 +2746,34 @@
     toast('项目 JSON 已导出');
   }
 
+  function exportCanvasHtml() {
+    if (!window.CANVAS_FILE) return;
+    updateProjectName();
+    const exportedData = {
+      ...window.CANVAS_FILE,
+      build: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      draft: clone(project)
+    };
+    const htmlDocument = document.documentElement.cloneNode(true);
+    for (const layerId of ['ucie-residual-layer', 'shape-layer', 'wire-layer', 'text-layer', 'component-layer', 'interaction-layer']) {
+      htmlDocument.querySelector(`#${layerId}`)?.replaceChildren();
+    }
+    const dataScript = [...htmlDocument.querySelectorAll('script')]
+      .find(script => script.textContent.trimStart().startsWith('window.CANVAS_FILE ='));
+    if (!dataScript) {
+      toast('没有找到独立画布数据，无法导出 HTML');
+      return;
+    }
+    const dataJson = JSON.stringify(exportedData).replace(/</g, '\\u003c');
+    dataScript.textContent = `window.CANVAS_FILE = ${dataJson};`;
+    const contents = `<!doctype html>\n${htmlDocument.outerHTML}`;
+    const filename = (canvasFile.title || project.name || 'floorplan')
+      .replace(/[\\/:*?"<>|]+/g, '-').trim() || 'floorplan';
+    download(`${filename}.html`, contents, 'text/html;charset=utf-8');
+    markSaved();
+    toast('独立 HTML 已导出，可直接打开并继续编辑');
+  }
+
   function exportSvg() {
     const copy = canvas.cloneNode(true);
     copy.removeAttribute('role');
@@ -2529,9 +2794,9 @@
     // 否则运放家族的 pins 还是空的，任何接到运放的导线都会被判为无效。
     applyUpstreamGeometry();
     if (!data || !Array.isArray(data.components) || !Array.isArray(data.wires) || !Array.isArray(data.texts)) throw new Error('项目文件格式不正确');
-    if (data.components.length > 1000 || data.wires.length > 4000 || data.texts.length > 1000) throw new Error('项目内容超出简版支持上限');
+    if (data.components.length > 1000 || data.wires.length > 4000 || data.texts.length > 20000) throw new Error('项目内容超出支持上限');
     const shapes = Array.isArray(data.shapes) ? data.shapes : [];
-    if (shapes.length > 1000) throw new Error('项目内容超出简版支持上限');
+    if (shapes.length > 20000) throw new Error('项目内容超出支持上限');
     const ids = new Set();
     for (const component of data.components) {
       if (!partSpecs[component.type] || typeof component.id !== 'string' || ids.has(component.id)) throw new Error('元件类型或编号无效');
@@ -2541,7 +2806,7 @@
       component.rotation = Number(component.rotation) || 0;
       component.flip = component.flip === 'x' ? 'x' : '';
       if (component.type === 'ruler') {
-        component.length = clamp(Number(component.length) || RULER_LENGTH, 1, 100000);
+        component.length = clamp(Number(component.length) || RULER_LENGTH, RULER_MIN_LENGTH, 100000);
         component.scale = clamp(Number(component.scale) || RULER_SCALE, 0.01, 1000);
         component.unit = String(component.unit || '').slice(0, 8);
       }
@@ -2562,11 +2827,45 @@
       shape.y = clamp(Number(shape.y) || 0, -10000, 10000);
       shape.width = clamp(Number(shape.width) || 0, 0, 10000);
       shape.height = clamp(Number(shape.height) || 0, 0, 10000);
+      shape.variableDiameter = shape.variableDiameter === true;
+      if (shape.kind === 'octagon' || shape.variableDiameter) {
+        const diameter = clamp(Math.min(shape.width || SHAPE_MIN, shape.height || SHAPE_MIN), SHAPE_MIN, 10000);
+        shape.width = diameter;
+        shape.height = diameter;
+      }
+      if (Number.isFinite(Number(shape.labelScaleBaseDiameter)) && Number(shape.labelScaleBaseDiameter) > 0) {
+        shape.labelScaleBaseDiameter = clamp(Number(shape.labelScaleBaseDiameter), 0.001, 10000);
+      } else delete shape.labelScaleBaseDiameter;
       shape.fill = sanitizeShapeFill(shape.fill);
       shape.stroke = isHexColor(shape.stroke) ? String(shape.stroke).toLowerCase() : '';
       shape.sw = clamp(Number(shape.sw) || 0, 0, 40);
+      shape.blockLabel = shape.blockLabel === true;
+      shape.label = String(shape.label || '').slice(0, 120);
+      if (Array.isArray(shape.labelLines)) shape.labelLines = shape.labelLines.slice(0, 12).map(line => String(line || '').slice(0, 120));
+      else delete shape.labelLines;
+      const dimension = shape.labelDimension;
+      if (dimension && [dimension.width, dimension.height, dimension.baseWidth, dimension.baseHeight].every(value => Number.isFinite(Number(value)) && Number(value) > 0)) {
+        shape.labelDimension = {
+          width: clamp(Number(dimension.width), 0.001, 100000),
+          height: clamp(Number(dimension.height), 0.001, 100000),
+          baseWidth: clamp(Number(dimension.baseWidth), 0.001, 10000),
+          baseHeight: clamp(Number(dimension.baseHeight), 0.001, 10000),
+          separator: /^[*x×]$/.test(dimension.separator) ? dimension.separator : '*'
+        };
+      } else delete shape.labelDimension;
+      if (shape.kind === 'freeform') {
+        shape.path = /^[MLCZ0-9eE+.,\s-]+$/i.test(String(shape.path || '')) ? String(shape.path) : '';
+        shape.pathX = clamp(Number(shape.pathX) || 0, -10000, 10000);
+        shape.pathY = clamp(Number(shape.pathY) || 0, -10000, 10000);
+        shape.dash = /^[0-9 .]+$/.test(String(shape.dash || '')) ? shape.dash : '';
+        shape.strokeNone = Boolean(shape.strokeNone);
+        shape.beginArrow = Boolean(shape.beginArrow);
+        shape.endArrow = Boolean(shape.endArrow);
+        shape.order = Number(shape.order) || 0;
+      }
     });
-    return { name: String(data.name || '导入的电路').slice(0, 60), components: data.components, wires: data.wires, texts: data.texts, shapes };
+    return { name: String(data.name || '导入的电路').slice(0, 60), components: data.components, wires: data.wires, texts: data.texts, shapes,
+      preserveVisioOrder: data.preserveVisioOrder === true };
   }
 
   function restoreLocalDraft() {
@@ -2629,7 +2928,7 @@
   }
 
   function fitView() {
-    // 画布编辑模式：画布尺寸就是图纸尺寸，整页适配即可。
+    // UCIe 编辑模式：画布尺寸就是图纸尺寸，整页适配即可。
     if (canvasFile || (!project.components.length && !project.texts.length)) {
       zoom = 1;
       viewBox = { x: 0, y: 0, width: CANVAS_W, height: CANVAS_H };
@@ -2655,16 +2954,16 @@
   }
 
   function setBlankProject() {
-    const resetLabel = canvasFile ? '重置为画布文件自带的原始图纸？未保存的更改会被替换。' : '新建图纸？未保存的更改会被替换。';
+    const resetLabel = canvasFile ? '重置为 Visio 原始框图？未保存的更改会被替换。' : '新建图纸？未保存的更改会被替换。';
     if (!confirm(resetLabel)) return;
     saveHistory();
-    project = canvasFile ? canvasDraft() : { name: '未命名电路', components: [], wires: [], texts: [], shapes: [] };
+    project = canvasFile ? ucieDraft() : { name: '未命名电路', components: [], wires: [], texts: [], shapes: [] };
     $('#project-name').value = project.name;
     clearSelection();
     zoom = 1;
     viewBox = { x: 0, y: 0, width: CANVAS_W, height: CANVAS_H };
     changed();
-    toast(canvasFile ? '已重置为原始图纸' : '已新建空白图纸');
+    toast(canvasFile ? '已重置为 Visio 原始框图' : '已新建空白图纸');
   }
 
   function loadExample() {
@@ -2688,15 +2987,17 @@
         : selected?.kind === 'shape' ? project.shapes.find(item => item.id === selected.id) : null;
     if (!target) return;
     if (property === 'fill') { setShapeFill(field.value); return; }
-    const numeric = ['rotation', 'size', 'width', 'height', 'length', 'scale', 'w', 'h', 'k', 'cycles', 'duty'].includes(property);
+    const numeric = ['rotation', 'size', 'width', 'height', 'diameter', 'length', 'scale', 'w', 'h', 'k', 'cycles', 'duty'].includes(property);
     const nextValue = numeric ? Number(field.value) : field.value;
-    if (target[property] === nextValue) return;
+    const variableDiameter = target.kind === 'octagon' || target.variableDiameter === true;
+    if (target[property] === nextValue || (property === 'diameter' && variableDiameter && target.width === nextValue && target.height === nextValue)) return;
     saveHistory();
     if (property === 'rotation') target.rotation = ((Math.round((nextValue || 0) / 90) * 90) % 360 + 360) % 360;
+    else if (property === 'diameter' && variableDiameter) target.width = target.height = clamp(nextValue || SHAPE_MIN, SHAPE_MIN, 10000);
     else if (property === 'size') target.size = clamp(nextValue || 18, 10, 48);
-    else if (property === 'width') target.width = clamp(nextValue || 1, 1, 10000);
-    else if (property === 'height') target.height = clamp(nextValue || 1, 1, 10000);
-    else if (property === 'length') target.length = clamp(nextValue || 1, 1, 100000);
+    else if (property === 'width') { target.width = clamp(nextValue || 1, 1, 10000); if (variableDiameter) target.height = target.width; }
+    else if (property === 'height') { target.height = clamp(nextValue || 1, 1, 10000); if (variableDiameter) target.width = target.height; }
+    else if (property === 'length') target.length = clamp(nextValue || RULER_MIN_LENGTH, RULER_MIN_LENGTH, 100000);
     else if (property === 'scale') target.scale = clamp(nextValue || 1, 0.01, 1000);
     else if (property === 'w') target.w = clamp(nextValue || 40, 40, 2000);
     else if (property === 'h') target.h = clamp(nextValue || 30, 30, 1200);
@@ -2734,15 +3035,55 @@
       renderScene();
       return;
     }
+    if (drag && drag.kind === 'freeform-draw') {
+      const shape = project.shapes.find(item => item.id === drag.id);
+      if (!shape) return;
+      const distance = Math.hypot(point.x - drag.originX, point.y - drag.originY);
+      if (drag.mode === 'free-line') {
+        drag.points[1] = point;
+      } else if (distance >= 3 * canvasUnitsPerPixel()) {
+        const last = drag.points[drag.points.length - 1];
+        if (Math.hypot(point.x - last.x, point.y - last.y) >= 2 * canvasUnitsPerPixel()) drag.points.push(point);
+      }
+      updateFreeformShape(shape, drag.points, drag.mode);
+      drag.moved = distance >= DRAG_THRESHOLD * canvasUnitsPerPixel();
+      renderScene();
+      return;
+    }
+
+    if (drag && drag.kind === 'freeform-draw') {
+      const shape = project.shapes.find(item => item.id === drag.id);
+      if (!shape) return;
+      const distance = Math.hypot(point.x - drag.originX, point.y - drag.originY);
+      if (drag.mode === 'free-line') {
+        drag.points[1] = point;
+      } else if (distance >= 3 * canvasUnitsPerPixel()) {
+        const last = drag.points[drag.points.length - 1];
+        if (Math.hypot(point.x - last.x, point.y - last.y) >= 2 * canvasUnitsPerPixel()) drag.points.push(point);
+      }
+      updateFreeformShape(shape, drag.points, drag.mode);
+      drag.moved = distance >= DRAG_THRESHOLD * canvasUnitsPerPixel();
+      renderScene();
+      return;
+    }
+
     if (drag && drag.kind === 'shape-draw') {
       const shape = project.shapes.find(item => item.id === drag.id);
       if (!shape) return;
       const edgeX = snapToGrid(point.x);
       const edgeY = snapToGrid(point.y);
-      shape.x = Math.min(drag.originX, edgeX);
-      shape.y = Math.min(drag.originY, edgeY);
-      shape.width = Math.abs(edgeX - drag.originX);
-      shape.height = Math.abs(edgeY - drag.originY);
+      if (shape.kind === 'octagon') {
+        const diameter = Math.min(Math.abs(edgeX - drag.originX), Math.abs(edgeY - drag.originY));
+        shape.x = edgeX < drag.originX ? drag.originX - diameter : drag.originX;
+        shape.y = edgeY < drag.originY ? drag.originY - diameter : drag.originY;
+        shape.width = diameter;
+        shape.height = diameter;
+      } else {
+        shape.x = Math.min(drag.originX, edgeX);
+        shape.y = Math.min(drag.originY, edgeY);
+        shape.width = Math.abs(edgeX - drag.originX);
+        shape.height = Math.abs(edgeY - drag.originY);
+      }
       drag.moved = true;
       renderScene();
       return;
@@ -2752,11 +3093,11 @@
       const component = project.components.find(item => item.id === drag.id);
       if (!component) return;
       const projected = (point.x - drag.fixed.x) * drag.dirX + (point.y - drag.fixed.y) * drag.dirY;
-      const span = clamp(projected, RULER_MIN_SPAN, RULER_MAX_SPAN);
+      const span = clamp(projected, Math.max(0.000001, RULER_MIN_LENGTH * drag.scale), RULER_MAX_SPAN);
       const half = span / 2;
       component.x = drag.fixed.x + drag.dirX * half;
       component.y = drag.fixed.y + drag.dirY * half;
-      component.length = niceRulerLength(span / drag.scale);
+      component.length = Number((span / drag.scale).toPrecision(6));
       drag.moved = true;
       renderScene();
       return;
@@ -2767,6 +3108,24 @@
       if (!shape) return;
       const dx = point.x - drag.pointerX;
       const dy = point.y - drag.pointerY;
+      if (shape.kind === 'octagon' || shape.variableDiameter) {
+        const horizontal = drag.handle.includes('e') ? drag.originW + dx : drag.handle.includes('w') ? drag.originW - dx : drag.originW;
+        const vertical = drag.handle.includes('s') ? drag.originH + dy : drag.handle.includes('n') ? drag.originH - dy : drag.originH;
+        const changedWidth = drag.handle.includes('e') || drag.handle.includes('w');
+        const changedHeight = drag.handle.includes('n') || drag.handle.includes('s');
+        const diameter = clamp(snapToGrid(changedWidth && changedHeight
+          ? (Math.abs(horizontal - drag.originW) >= Math.abs(vertical - drag.originH) ? horizontal : vertical)
+          : changedWidth ? horizontal : vertical), SHAPE_MIN, 10000);
+        shape.x = drag.handle.includes('w') ? drag.originX + drag.originW - diameter
+          : drag.handle.includes('e') ? drag.originX : drag.originX + (drag.originW - diameter) / 2;
+        shape.y = drag.handle.includes('n') ? drag.originY + drag.originH - diameter
+          : drag.handle.includes('s') ? drag.originY : drag.originY + (drag.originH - diameter) / 2;
+        shape.width = diameter;
+        shape.height = diameter;
+        drag.moved = true;
+        renderScene();
+        return;
+      }
       let left = drag.originX;
       let top = drag.originY;
       let right = drag.originX + drag.originW;
@@ -2863,6 +3222,34 @@
     const finished = drag;
     drag = null;
     guides = [];
+    if (finished.kind === 'freeform-draw') {
+      const shape = project.shapes.find(item => item.id === finished.id);
+      if (!shape || !finished.moved) {
+        project.shapes = project.shapes.filter(item => item.id !== finished.id);
+        if (undoStack.length) undoStack.pop();
+        updateHistoryButtons();
+        renderScene();
+        return;
+      }
+      selectOne('shape', shape.id);
+      setTool('select');
+      changed();
+      return;
+    }
+    if (finished.kind === 'freeform-draw') {
+      const shape = project.shapes.find(item => item.id === finished.id);
+      if (!shape || !finished.moved) {
+        project.shapes = project.shapes.filter(item => item.id !== finished.id);
+        if (undoStack.length) undoStack.pop();
+        updateHistoryButtons();
+        renderScene();
+        return;
+      }
+      selectOne('shape', shape.id);
+      setTool('select');
+      changed();
+      return;
+    }
     if (finished.kind === 'shape-draw') {
       const shape = project.shapes.find(item => item.id === finished.id);
       // 只是点了一下：撤掉这个空图形与对应的历史记录。
@@ -2903,11 +3290,12 @@
       canvas.classList.add('panning');
       return;
     }
-    if (event.target.closest('[data-component-id]') || event.target.closest('[data-text-id]') || event.target.closest('[data-wire-id]') || event.target.closest('[data-shape-id]')) return;
+    const drawingShape = ['shape', 'free-line', 'free-curve'].includes(tool);
+    if (!drawingShape && (event.target.closest('[data-component-id]') || event.target.closest('[data-text-id]') || event.target.closest('[data-wire-id]') || event.target.closest('[data-shape-id]'))) return;
     const point = svgPoint(event);
     pointerPosition = point;
     if (tool === 'text') { addText(point.x, point.y); return; }
-    if (tool === 'shape') {
+    if (drawingShape) {
       canvas.setPointerCapture(event.pointerId);
       beginShapeDraw(point);
       return;
@@ -3021,7 +3409,13 @@
     addComponent(type, point.x, point.y);
   });
 
-  $$('.tool-button').forEach(button => button.addEventListener('click', () => setTool(button.dataset.tool)));
+  $$('.tool-button').forEach(button => button.addEventListener('click', () => {
+    if (button.dataset.tool === 'free-line' || button.dataset.tool === 'free-curve') {
+      setShapeTool(button.dataset.tool, button.dataset.tool);
+    } else {
+      setTool(button.dataset.tool);
+    }
+  }));
   $$('[data-tool="text"]').forEach(button => button.addEventListener('click', () => setTool('text')));
   $('#undo').addEventListener('click', undo);
   $('#redo').addEventListener('click', redo);
@@ -3033,6 +3427,7 @@
   $('#open-project').addEventListener('click', () => $('#file-input').click());
   $('#file-input').addEventListener('change', event => importFile(event.target.files[0]));
   $('#save-project').addEventListener('click', exportProject);
+  $('#save-html')?.addEventListener('click', exportCanvasHtml);
   $('#export-svg').addEventListener('click', exportSvg);
   $('#license-open').addEventListener('click', () => { $('#license-overlay').hidden = false; });
   $('#license-close').addEventListener('click', () => { $('#license-overlay').hidden = true; });
@@ -3059,7 +3454,10 @@
     });
   });
 
-  inspector.addEventListener('change', updateInspectorProperty);
+  inspector.addEventListener('change', event => {
+    if (event.target.id === 'shape-label') labelPreview = null;
+    updateInspectorProperty(event);
+  });
   document.addEventListener('keyup', event => {
     if (event.code === 'Space') { spaceDown = false; canvas.classList.remove('pannable'); }
   });
@@ -3076,6 +3474,22 @@
     if (event.target.closest('[data-action="delete"]')) removeSelection();
   });
   inspector.addEventListener('input', event => {
+    if (event.target.id === 'shape-label') {
+      const shape = selected?.kind === 'shape' ? project.shapes.find(item => item.id === selected.id) : null;
+      if (!shape) return;
+      if (labelPreview === null) { labelPreview = shape.label || ''; saveHistory(); }
+      shape.label = event.target.value.slice(0, 120);
+      if (shape.kind === 'octagon' || shape.variableDiameter) updateOctagonLabel(shape);
+      else {
+        delete shape.labelLines;
+        delete shape.labelDimension;
+        delete shape.labelScaleBaseDiameter;
+      }
+      renderScene();
+      updateSaveState();
+      try { localStorage.setItem(draftStorageKey, snapshot()); } catch (_) { /* optional browser recovery */ }
+      return;
+    }
     if (event.target.id !== 'shape-fill') return;
     const shape = selected?.kind === 'shape' ? project.shapes.find(item => item.id === selected.id) : null;
     if (!shape || shape.kind === 'line') return;
@@ -3134,7 +3548,7 @@
   $('#rotation-preset')?.addEventListener('change', () => {});
   const restoredDraft = restoreLocalDraft();
   // 画布文件：本地草稿优先，其次是文件自带的初始图纸
-  if (!restoredDraft && canvasFile) project = canvasDraft();
+  if (!restoredDraft && canvasFile) project = ucieDraft();
   $('#project-name').value = project.name;
   configureCanvasFile();
   setInspectorTab('properties');

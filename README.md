@@ -52,6 +52,10 @@
 - 拖图形本体可移动，拖控制点可缩放，两者都会吸附网格与其它对象。
 - 选中图形后在右侧检查器里选**填充颜色**：第一格是「无填充（透明）」，其余是常用色，
   也可以用取色器选任意颜色；新建图形会沿用上一次用过的填充色（直线无内部区域，不填充）。
+- 元件库里的**可调矩形**可在右侧编辑框内文字；文字最多两行并自动适配字号。AT7210 Floorplan 的尺寸行随矩形宽高比例显示，源标签文本保持不变。
+- **八边形**保持正形并以单一直径缩放，可编辑框内最多两行文字；第二行写成`宽*高`时，两项数值会按直径使用相同倍率显示。
+- 元件库的**可变八边形 / 可变圆形**支持直径属性与框内文字；重建 AT7210 Floorplan 时，既有八边形焊盘会转换成可变直径八边形并保留原标签。
+- AT7210 Floorplan 中的 `2.2741 mm` 标尺会转换成 ruler 元件；比例按矩形画布宽度/标签数字标定，显示为细基线和刻度，端点缩放时数值按固定比例连续变化，原方向也会保留。
 - 图形画在电路**下方**，适合当框图或分组框；描边很细时靠隐藏的命中矩形保证好拖。
 - 快捷键 `S` 切到图形工具，`Esc` 退出。
 
@@ -96,19 +100,18 @@
 在 `~/.cdsinit` 里加一次，然后对着原理图点【回路 → 生成 HTML 电路图】或按 `Ctrl+Shift+G`：
 
 ```skill
-ccRepoPath = "~/circuit-canvas"          ; 改成你的克隆路径
+ccRepoPath = "/work/agent_cowork/circuit-canvas"
 load(strcat(ccRepoPath "/virtuoso/circuit_canvas.il"))
 ```
 
 安装细节、可配置项、自检命令、踩坑记录都在 **[`virtuoso/README.md`](virtuoso/README.md)**，
-真实 cellview 的回归样本在 `tools/examples/virtuoso_real/`。
+测试脚本在 `virtuoso/.test/`（含 4 个真实 cellview 的回归样本）。
 
 ### 用法二：脚本化两步走
 
 ```skill
-;; 1) 在 CIW 里把 cellview 导成 JSON（只读打开，不改原图）；
-;;    schematic_to_json.il 是配合本项目的导出脚本，路径按你的环境替换
-load("/path/to/schematic_to_json.il")
+;; 1) 在 CIW 里导出 JSON（只读打开 cellview，不改原图）
+load("/path/to/cadence-analog-ic/scripts/skill/schematic_to_json.il")
 s2jExportSchematic("myLib" "two_stage_miller" "/tmp/opamp.json")
 ```
 
@@ -184,9 +187,9 @@ python3 tools/virtuoso-to-canvas.py /tmp/opamp.json --out opamp.html --layout ke
   连线不会凭空断掉；报告里会列出画成了哪些黑盒。悬空网络、未匹配端子也会打印警告。
 
 生成的 HTML 就是一张**独立画布文件**，可编辑、可继续连线、右侧实时推导 SPICE 网表，
-数据内嵌在文件里。
+和 `ucie.html` 是同一个机制（数据内嵌在文件里）。
 
-⚠️ 「多文件」形态要求 HTML 与 `styles.css` / `symbols.generated.js` /
+⚠️ 但 `ucie.html` 那种「多文件」形态要求 HTML 与 `styles.css` / `symbols.generated.js` /
 `app.js` **在同一个目录**里；只把 HTML 拷到别处会变成一张没样式、画不出电路图的白页。
 所以转换器会自动判断：**输出目录不是 `circuit-canvas/` 时，直接产出单文件内联版**
 （CSS / 元件几何 / 逻辑 / 许可文本全部内嵌，约 380 KB，拷到哪都能打开）。
@@ -225,7 +228,8 @@ python3 tools/virtuoso-to-canvas.py /tmp/opamp.json --out opamp.html \
 index.html   styles.css   app.js   symbols.generated.js
 ```
 
-- 想带上某张示例画布，把对应的 `*.html` 一并拷过去即可（数据已内嵌在文件里）。
+- 想带上 UCIe 那张图，再加 `ucie.html`（独立画布文件，数据在文件里）；
+  旧入口 `index.html?ucie=sheet` 才需要 `assets/ucie-canvas.js`，平时可以不带。
 - `LICENSE` 建议一并带上（AGPL-3.0-only 要求随程序分发许可文本）。
 - `tools/` 只有重新生成元件几何时才需要，普通使用可以不带。
 - 拷过去后直接用系统浏览器（Firefox / Chrome / Edge）打开 `index.html` 即可；
@@ -260,32 +264,34 @@ python3 tools/build-portable.py          # 生成 dist/huilu.html（约 330 KB�
 但每一张具体图纸都是**独立的一个 HTML 文件，数据内嵌在自己身上**：
 
 ```
-index.html             通用画布（新建 / 打开通用图纸）
-miller_opamp.html      示例画布：两级 Miller 运放（合成数据）
-virtuoso_demo_inv.html 示例画布：真实 Cadence 导出（反相器）
+index.html    通用画布（新建 / 打开通用图纸）
+ucie.html     独立画布文件：AT7210 · UCIe Analog PHY Blocks
 ```
 
-- 打开某个画布文件就直接进入这张图的可编辑画布，不需要任何查询参数；
+- 打开 `ucie.html` 直接进入这张图的可编辑画布，不需要任何查询参数；
 - 文件可以单独拷贝到别的机器（目标机器只要有同一份 `circuit-canvas` 目录即可），
-  顶栏右侧会多出一个「通用画布」按钮返回 `index.html`；
+  顶栏右侧的按钮会从「UCIe 画布」变成「通用画布」用于返回 `index.html`；
 - 每张画布的本地草稿 key 是 `huilu-canvas-<id>-local-draft`（`id` 写在画布文件里），
   所以多张画布之间、以及和通用画布之间**互不覆盖**；
-- 想做「子 sheet」，再生成一个画布文件放进同一目录，就能互相跳转。
+- 想做「子 sheet」，再生成一个画布文件放进同一目录，然后在各自文件里改一下
+  顶栏按钮的链接即可互相跳转。
 
-把一张图纸数据（`assets/*-canvas.js`，可由 `tools/virtuoso-to-canvas.py` 生成）
-打包成独立画布文件：
+从 Visio 图纸生成一张新画布（以 UCIe 为例）：
 
 ```bash
-python3 tools/build-canvas-file.py --data assets/miller-opamp-canvas.js \
-    --out miller_opamp.html --id miller-opamp --title "两级 Miller 运放"
+python3 tools/build-ucie-diagram.py     # 解析 .vsdx → assets/ucie-canvas.js
+python3 tools/build-canvas-file.py      # 打包 → ucie.html（单文件 115 KB）
+# 换一张图纸：
+python3 tools/build-canvas-file.py --data assets/xxx-canvas.js --out xxx.html \
+    --id xxx-sheet --title "XXX 框图"
 ```
 
 `build-canvas-file.py` 拿 `index.html` 当外壳模板（顶栏 / 元件库 / 检查器都是同一份），
-只把顶部的 `<!-- @@CANVAS_DATA@@ -->` 占位符换成内嵌的 `window.CANVAS_FILE = {...}`，
-所以 UI 改动不会分散到多份文件里；改完 `index.html` 后重新跑一次即可同步。
-生成出来的文件头有注释标明「请勿手改，改数据请重新生成」。
+只把数据脚本换成内嵌的 `window.CANVAS_FILE = {...}`，所以 UI 改动不会分散到多份文件里；
+改完 `index.html` 后重新跑一次即可同步。生成出来的文件头有注释标明「请勿手改，
+改数据请重新生成」。
 
-> ⚠️ `app.js` 是**所有外壳共用的运行期**（`index.html` / 每个画布文件都加载它）。
+> ⚠️ `app.js` 是**所有外壳共用的运行期**（`index.html` / `ucie.html` / 每个画布文件都加载它）。
 > 改外壳结构（例如新增滚动条那对 `#scrollbar-x/y`）后，**已有画布文件要重新生成一遍**
 > 才能拿到新 UI；`app.js` 里引用 DOM 一律先判空，缺元素只是少个功能，不会让整页白掉。
 > 排查时用 `grep -rl 'app.js' --include='*.html' .` 就能列出全部外壳。

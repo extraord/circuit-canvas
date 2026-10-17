@@ -2,7 +2,7 @@
 ;;
 ;; 推荐在 ~/.cdsinit 里这样写（显式给出路径最稳）：
 ;;
-;;   ccRepoPath     = "~/circuit-canvas"        ; 改成你的克隆路径
+;;   ccRepoPath     = "/work/agent_cowork/circuit-canvas"
 ;;   ; ccOutputDir  = "/home/me/circuit_html"   ; 默认 ~/circuit_canvas_out
 ;;   ; ccAutoOpenBrowser = t                    ; 默认 t
 ;;   ; ccFixedMenuOn = t                        ; 默认 nil；t 会在 schematic 图标栏加一排【回路】按钮
@@ -27,6 +27,7 @@
 let( (cands repo vdir)
   cands = list( getShellEnvVar("CC_REPO")
                 if(boundp('ccRepoPath) ccRepoPath nil)
+                "/work/agent_cowork/circuit-canvas"
                 strcat(getShellEnvVar("HOME") "/circuit-canvas") )
   repo = nil
   foreach( c cands
@@ -44,6 +45,6 @@ let( (cands repo vdir)
   else
     printf("*ERROR* circuit_canvas.il: 找不到 circuit-canvas 仓库。\n")
     printf("        请在 .cdsinit 里先设置 ccRepoPath，或设环境变量 CC_REPO。\n")
-    printf("        例如: ccRepoPath = \"/home/you/circuit-canvas\"\n")
+    printf("        例如: ccRepoPath = \"/work/agent_cowork/circuit-canvas\"\n")
   )
 )

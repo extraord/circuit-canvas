@@ -17,9 +17,6 @@
   <title>回路 · 电路绘图</title>
   <link rel="stylesheet" href="./styles.css">
   <script defer src="./symbols.generated.js"></script>
-  <!-- 独立画布文件的数据占位符：tools/build-canvas-file.py 会把它替换成
-       内嵌的 window.CANVAS_FILE = {...} -->
-  <!-- @@CANVAS_DATA@@ -->
   <script defer src="./app.js"></script>
 </head>
 <body>
@@ -33,11 +30,11 @@
       <div class="document-title"><span class="live-dot"></span><input id="project-name" aria-label="项目名称" value="RC 低通滤波器"></div>
       <div class="top-spacer"></div>
       <div class="save-state" id="save-state"><span class="save-indicator"></span><span>本地草稿</span></div>
-      <a class="top-action" id="open-home-sheet" href="./index.html" title="返回通用电路画布" hidden><span class="button-icon">▧</span><span>通用画布</span></a>
-      <button class="top-action" id="toggle-residual" title="显示或隐藏残余几何（未被拆成对象的线条）" aria-pressed="true" hidden><span class="button-icon">◉</span><span>隐藏残余几何</span></button>
+      <button class="top-action" id="toggle-ucie-reference" title="显示或隐藏残余几何（未被拆成对象的线条）" aria-pressed="true" hidden><span class="button-icon">◉</span><span>隐藏残余几何</span></button>
       <button class="top-action" id="new-project" title="新建空白图纸"><span class="button-icon">＋</span><span>新建</span></button>
       <button class="top-action" id="open-project" title="打开本地项目 JSON"><span class="button-icon">↥</span><span>打开</span></button>
       <button class="top-action" id="save-project" title="保存项目 JSON"><span class="button-icon">↓</span><span>保存</span></button>
+      <button class="top-action" id="save-html" title="下载当前独立画布 HTML" hidden><span class="button-icon">↓</span><span>HTML</span></button>
       <button class="export-action" id="export-svg"><span class="button-icon">↗</span><span>导出 SVG</span></button>
       <input id="file-input" type="file" accept=".json,.circuit,application/json" hidden>
     </header>
@@ -181,11 +178,13 @@
             <button class="part-button" draggable="true" data-type="digital-wave-signal"><span class="part-icon"></span><span><strong>数据波形</strong><small>Data · 序列可填 1011</small></span></button>
             <button class="part-button" draggable="true" data-type="digital-wave-bus"><span class="part-icon"></span><span><strong>总线波形</strong><small>Bus · 分组标签 D0 D1 D2</small></span></button>
           </section>
-          <section class="part-group" data-group="标尺与可调矩形"><div class="group-title">标尺与可调矩形 <span>02</span></div>
+          <section class="part-group" data-group="标尺与可变形状"><div class="group-title">标尺与可变形状 <span>04</span></div>
             <button class="part-button" draggable="true" data-type="ruler"><span class="part-icon"></span><span><strong>标尺</strong><small>Ruler · 尺寸随长度与比例</small></span></button>
             <button class="part-button" draggable="true" data-type="rect-block"><span class="part-icon"></span><span><strong>可调矩形</strong><small>Rectangle with W/H fields</small></span></button>
+            <button class="part-button" draggable="true" data-type="variable-octagon"><span class="part-icon"></span><span><strong>可变八边形</strong><small>Octagon · diameter and label</small></span></button>
+            <button class="part-button" draggable="true" data-type="variable-circle"><span class="part-icon"></span><span><strong>可变圆形</strong><small>Circle · diameter and label</small></span></button>
           </section>
-          <section class="part-group" data-group="图形与标注"><div class="group-title">图形与标注 <span>17</span></div>
+          <section class="part-group" data-group="图形与标注"><div class="group-title">图形与标注 <span>19</span></div>
             <button class="part-button shape-part" data-shape="rectangle"><span class="part-icon"></span><span><strong>矩形</strong><small>Rectangle</small></span></button>
             <button class="part-button shape-part" data-shape="rounded-rect"><span class="part-icon"></span><span><strong>圆角矩形</strong><small>Rounded rectangle</small></span></button>
             <button class="part-button shape-part" data-shape="dashed-rect"><span class="part-icon"></span><span><strong>虚线框</strong><small>Dashed frame</small></span></button>
@@ -203,6 +202,8 @@
             <button class="part-button shape-part" data-shape="arrow"><span class="part-icon"></span><span><strong>箭头</strong><small>Arrow</small></span></button>
             <button class="part-button shape-part" data-shape="arrow-double"><span class="part-icon"></span><span><strong>双向箭头</strong><small>Double-headed arrow</small></span></button>
             <button class="part-button shape-part" data-shape="line"><span class="part-icon"></span><span><strong>直线</strong><small>Line</small></span></button>
+            <button class="part-button shape-part" data-shape="free-line"><span class="part-icon"></span><span><strong>自由直线</strong><small>Free line</small></span></button>
+            <button class="part-button shape-part" data-shape="free-curve"><span class="part-icon"></span><span><strong>自由曲线</strong><small>Free curve</small></span></button>
           </section>
         </div>
         <div class="library-tip"><span class="tip-star">✳</span><span>拖入画布放置元件<br><b>或点击元件快速添加</b></span></div>
@@ -215,6 +216,8 @@
             <button class="tool-button" data-tool="wire" title="连接两个引脚 (W)"><span class="tool-glyph wire-glyph">⌁</span><span>导线</span></button>
             <button class="tool-button" data-tool="text" title="添加文字标注 (T)"><span class="tool-glyph text-glyph">T</span><span>标注</span></button>
             <button class="tool-button" data-tool="shape" title="拖动绘制图形 (S)"><span class="tool-glyph shape-glyph">▱</span><span>图形</span></button>
+            <button class="tool-button" data-tool="free-line" title="拖动绘制自由直线"><span class="tool-glyph shape-glyph">／</span><span>自由直线</span></button>
+            <button class="tool-button" data-tool="free-curve" title="按住并拖动绘制自由曲线"><span class="tool-glyph shape-glyph">∿</span><span>自由曲线</span></button>
           </div>
           <span class="toolbar-rule"></span>
           <button class="icon-button" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销">↶</button>
@@ -233,10 +236,10 @@
               <defs>
                 <pattern id="minor-grid" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" fill="#ccd4cf"/></pattern>
                 <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#minor-grid)"/><path d="M100 0H0V100" fill="none" stroke="#c6d0ca" stroke-width="1"/></pattern>
-                <marker id="residual-arrow" markerWidth="0.14" markerHeight="0.12" refX="0.12" refY="0.05" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 0.13 0.05 L 0 0.1 Z" fill="#263934"/></marker>
+                <marker id="ucie-arrow" markerWidth="0.14" markerHeight="0.12" refX="0.12" refY="0.05" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 0.13 0.05 L 0 0.1 Z" fill="#263934"/></marker>
               </defs>
               <rect class="canvas-bg" x="0" y="0" width="1200" height="800" fill="url(#major-grid)"/>
-              <g id="residual-layer" class="residual-layer" pointer-events="none"></g>
+              <g id="ucie-residual-layer" class="ucie-residual-layer" pointer-events="none"></g>
               <g id="shape-layer"></g>
               <g id="wire-layer"></g>
               <g id="text-layer"></g>

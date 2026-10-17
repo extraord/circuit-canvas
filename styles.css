@@ -119,11 +119,11 @@ kbd { min-width: 18px; padding: 2px 4px; border: 1px solid #e1e6e2; border-radiu
 .canvas-paper { width: min(100%, calc((100vh - 183px) * 1.5)); max-height: 100%; aspect-ratio: 3 / 2; background: #fbfcfa; border: 1px solid #dfe5e0; box-shadow: 0 8px 24px #31493b0b, 0 1px 3px #31493b0a; overflow: hidden; }
 #circuit-canvas { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; }
 .canvas-bg { cursor: crosshair; }
-#toggle-residual[hidden] { display: none; }
-.canvas-edit-mode #empty-hint { display: none; }
-.canvas-edit-mode .canvas-wrap { overflow: auto; align-items: flex-start; }
-.canvas-edit-mode .canvas-paper { width: 100%; height: auto; max-height: none; flex: 0 0 auto; }
-.residual-layer { pointer-events: none; }
+#toggle-ucie-reference[hidden] { display: none; }
+.ucie-edit-mode #empty-hint { display: none; }
+.ucie-edit-mode .canvas-wrap { overflow: auto; align-items: flex-start; }
+.ucie-edit-mode .canvas-paper { width: 100%; height: auto; max-height: none; flex: 0 0 auto; }
+.ucie-residual-layer { pointer-events: none; }
 #circuit-canvas.pannable { cursor: grab; }
 #circuit-canvas.panning { cursor: grabbing; }
 .library-ghost { position: fixed; z-index: 60; width: 52px; height: 36px; margin: -18px 0 0 -26px; display: flex; align-items: center; justify-content: center; padding: 3px; border: 1px solid #b9cdc2; border-radius: 6px; background: #fbfcfa; box-shadow: 0 8px 18px #31493b26; opacity: .92; pointer-events: none; }
@@ -136,11 +136,10 @@ body.library-dragging { cursor: grabbing; }
 .component .symbol-solid { fill: #263934; stroke: none; }
 /* 标尺 */
 .ruler-hit { fill: #ffffff; fill-opacity: 0; }
-.ruler-body { fill: #fdfefd; stroke: #263934; stroke-width: 1.3; }
-.ruler-tick { stroke: #263934; stroke-width: 0.9; }
-.ruler-tick.major { stroke-width: 1.4; }
+.ruler-axis, .ruler-tick { stroke: #263934; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.ruler-tick.major { stroke-width: 1.2; }
 .ruler-label { font: 700 11px var(--sans); fill: #2e4138; }
-.component.selected .ruler-body { stroke: #bf7047; }
+.component.selected .ruler-axis,
 .component.selected .ruler-tick { stroke: #bf7047; }
 .component.selected .ruler-label { fill: #bf7047; }
 /* 函数曲线 / 概率分布 / 数字波形 */
@@ -168,6 +167,7 @@ body.library-dragging { cursor: grabbing; }
 .shape-group .shape { fill: none; stroke: #4a6157; stroke-width: 1.6; stroke-linejoin: miter; stroke-linecap: butt; }
 .shape-group .shape-dashed { stroke-dasharray: 8 5; }
 .shape-group.selected .shape { stroke: #bf7047; }
+.shape-label { fill: #33483e; font-family: "Aptos", "Microsoft YaHei", sans-serif; font-weight: 600; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
 .shape-hit { fill: #ffffff; fill-opacity: 0; stroke: none; pointer-events: all; }
 .shape-handle { fill: #fbfcfa; stroke: var(--green); stroke-width: 1.4; vector-effect: non-scaling-stroke; }
 .shape-handle:hover { fill: var(--green); }

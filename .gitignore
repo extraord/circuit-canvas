@@ -1,15 +1,8 @@
-# 生成物 / 缓存
 tools/.cache/
-tools/__pycache__/
-__pycache__/
-*.pyc
 dist/
+__pycache__/
 
-# Virtuoso 端到端导出的临时产物
-*.log
+# Virtuoso 集成测试的临时产物（测试脚本本身要提交，产物不提交）
 virtuoso/.test/out/
-
-# 编辑器 / 系统
-.DS_Store
-Thumbs.db
-.vscode/
+virtuoso/.test/*.log
+virtuoso/.test/gui_result.txt

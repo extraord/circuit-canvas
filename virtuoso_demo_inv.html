@@ -40,8 +40,8 @@
       <div class="document-title"><span class="live-dot"></span><input id="project-name" aria-label="项目名称" value="RC 低通滤波器"></div>
       <div class="top-spacer"></div>
       <div class="save-state" id="save-state"><span class="save-indicator"></span><span>本地草稿</span></div>
-      <a class="top-action" id="open-home-sheet" href="./index.html" title="返回通用电路画布" hidden><span class="button-icon">▧</span><span>通用画布</span></a>
-      <button class="top-action" id="toggle-residual" title="显示或隐藏残余几何（未被拆成对象的线条）" aria-pressed="true" hidden><span class="button-icon">◉</span><span>隐藏残余几何</span></button>
+      <a class="top-action" id="open-ucie-sheet" href="./ucie.html" title="打开 UCIe Analog PHY Blocks 独立画布文件"><span class="button-icon">▧</span><span>UCIe 画布</span></a>
+      <button class="top-action" id="toggle-ucie-reference" title="显示或隐藏残余几何（未被拆成对象的线条）" aria-pressed="true" hidden><span class="button-icon">◉</span><span>隐藏残余几何</span></button>
       <button class="top-action" id="new-project" title="新建空白图纸"><span class="button-icon">＋</span><span>新建</span></button>
       <button class="top-action" id="open-project" title="打开本地项目 JSON"><span class="button-icon">↥</span><span>打开</span></button>
       <button class="top-action" id="save-project" title="保存项目 JSON"><span class="button-icon">↓</span><span>保存</span></button>
@@ -239,10 +239,10 @@
               <defs>
                 <pattern id="minor-grid" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.8" fill="#ccd4cf"/></pattern>
                 <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#minor-grid)"/><path d="M100 0H0V100" fill="none" stroke="#c6d0ca" stroke-width="1"/></pattern>
-                <marker id="residual-arrow" markerWidth="0.14" markerHeight="0.12" refX="0.12" refY="0.05" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 0.13 0.05 L 0 0.1 Z" fill="#263934"/></marker>
+                <marker id="ucie-arrow" markerWidth="0.14" markerHeight="0.12" refX="0.12" refY="0.05" orient="auto" markerUnits="userSpaceOnUse"><path d="M 0 0 L 0.13 0.05 L 0 0.1 Z" fill="#263934"/></marker>
               </defs>
               <rect class="canvas-bg" x="0" y="0" width="1200" height="800" fill="url(#major-grid)"/>
-              <g id="residual-layer" class="residual-layer" pointer-events="none"></g>
+              <g id="ucie-residual-layer" class="ucie-residual-layer" pointer-events="none"></g>
               <g id="shape-layer"></g>
               <g id="wire-layer"></g>
               <g id="text-layer"></g>
